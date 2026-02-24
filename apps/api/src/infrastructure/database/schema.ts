@@ -364,21 +364,24 @@ export const collegeRelations = relations(colleges, ({ many }) => ({
   collegeLinks: many(collegeLinks),
 }));
 
-export const collegeLinkRelations = relations(collegeLinks, ({ one, many }) => ({
-  user: one(user, {
-    fields: [collegeLinks.userId],
-    references: [user.id],
+export const collegeLinkRelations = relations(
+  collegeLinks,
+  ({ one, many }) => ({
+    user: one(user, {
+      fields: [collegeLinks.userId],
+      references: [user.id],
+    }),
+    college: one(colleges, {
+      fields: [collegeLinks.collegeId],
+      references: [colleges.id],
+    }),
+    attendances: many(attendances),
+    timetables: many(timetables),
+    marks: many(marks),
+    courses: many(courses),
+    syncLogs: many(syncLogs),
   }),
-  college: one(colleges, {
-    fields: [collegeLinks.collegeId],
-    references: [colleges.id],
-  }),
-  attendances: many(attendances),
-  timetables: many(timetables),
-  marks: many(marks),
-  courses: many(courses),
-  syncLogs: many(syncLogs),
-}));
+);
 
 export const attendanceRelations = relations(attendances, ({ one }) => ({
   collegeLink: one(collegeLinks, {

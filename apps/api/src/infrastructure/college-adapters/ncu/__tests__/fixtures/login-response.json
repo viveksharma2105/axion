@@ -1,0 +1,7 @@
+{
+  "Token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxMjM0NTYiLCJleHAiOjE3MzAwMDAwMDB9.dummy-signature",
+  "EncodedId": "MTIzNDU2",
+  "UserId": "123456",
+  "Message": "Login Successful",
+  "Status": true
+}

@@ -95,12 +95,8 @@
           "name": "account_user_id_user_id_fk",
           "tableFrom": "account",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -256,12 +252,8 @@
           "name": "attendances_college_link_id_college_links_id_fk",
           "tableFrom": "attendances",
           "tableTo": "college_links",
-          "columnsFrom": [
-            "college_link_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["college_link_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -271,11 +263,7 @@
         "attendances_link_course_synced_unique": {
           "name": "attendances_link_course_synced_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "college_link_id",
-            "course_code",
-            "synced_at"
-          ]
+          "columns": ["college_link_id", "course_code", "synced_at"]
         }
       },
       "policies": {},
@@ -431,12 +419,8 @@
           "name": "college_links_user_id_user_id_fk",
           "tableFrom": "college_links",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -444,12 +428,8 @@
           "name": "college_links_college_id_colleges_id_fk",
           "tableFrom": "college_links",
           "tableTo": "colleges",
-          "columnsFrom": [
-            "college_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["college_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -459,10 +439,7 @@
         "college_links_user_college_unique": {
           "name": "college_links_user_college_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "user_id",
-            "college_id"
-          ]
+          "columns": ["user_id", "college_id"]
         }
       },
       "policies": {},
@@ -541,9 +518,7 @@
         "colleges_slug_unique": {
           "name": "colleges_slug_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "slug"
-          ]
+          "columns": ["slug"]
         }
       },
       "policies": {},
@@ -645,12 +620,8 @@
           "name": "courses_college_link_id_college_links_id_fk",
           "tableFrom": "courses",
           "tableTo": "college_links",
-          "columnsFrom": [
-            "college_link_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["college_link_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -780,12 +751,8 @@
           "name": "marks_college_link_id_college_links_id_fk",
           "tableFrom": "marks",
           "tableTo": "college_links",
-          "columnsFrom": [
-            "college_link_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["college_link_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -886,12 +853,8 @@
           "name": "notifications_user_id_user_id_fk",
           "tableFrom": "notifications",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -963,12 +926,8 @@
           "name": "session_user_id_user_id_fk",
           "tableFrom": "session",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -978,9 +937,7 @@
         "session_token_unique": {
           "name": "session_token_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
+          "columns": ["token"]
         }
       },
       "policies": {},
@@ -1069,12 +1026,8 @@
           "name": "sync_logs_college_link_id_college_links_id_fk",
           "tableFrom": "sync_logs",
           "tableTo": "college_links",
-          "columnsFrom": [
-            "college_link_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["college_link_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1198,12 +1151,8 @@
           "name": "timetables_college_link_id_college_links_id_fk",
           "tableFrom": "timetables",
           "tableTo": "college_links",
-          "columnsFrom": [
-            "college_link_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["college_link_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1271,9 +1220,7 @@
         "user_email_unique": {
           "name": "user_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -1343,12 +1290,8 @@
           "name": "user_profiles_user_id_user_id_fk",
           "tableFrom": "user_profiles",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1358,9 +1301,7 @@
         "user_profiles_user_id_unique": {
           "name": "user_profiles_user_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "user_id"
-          ]
+          "columns": ["user_id"]
         }
       },
       "policies": {},

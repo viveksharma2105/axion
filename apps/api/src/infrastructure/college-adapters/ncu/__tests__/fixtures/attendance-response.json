@@ -1,0 +1,46 @@
+{
+  "Data": [
+    {
+      "CourseCode": "CSE101",
+      "CourseName": "Introduction to Computer Science",
+      "TotalLectures": 40,
+      "TotalPresent": 35,
+      "TotalAbsent": 3,
+      "LOA": 1,
+      "OnDuty": 1,
+      "Percentage": 87.5
+    },
+    {
+      "CourseCode": "MAT201",
+      "CourseName": "Discrete Mathematics",
+      "TotalLectures": 36,
+      "TotalPresent": 30,
+      "TotalAbsent": 4,
+      "LOA": 2,
+      "OnDuty": 0,
+      "Percentage": 83.33
+    },
+    {
+      "CourseCode": "PHY102",
+      "CourseName": "Engineering Physics",
+      "TotalLectures": 30,
+      "TotalPresent": 20,
+      "TotalAbsent": 8,
+      "LOA": 1,
+      "OnDuty": 1,
+      "Percentage": 66.67
+    },
+    {
+      "CourseCode": "ENG101",
+      "CourseName": "Technical Communication",
+      "TotalLectures": 25,
+      "TotalPresent": 24,
+      "TotalAbsent": 0,
+      "LOA": 0,
+      "OnDuty": 1,
+      "Percentage": 96.0
+    }
+  ],
+  "Message": "Success",
+  "Status": true
+}
