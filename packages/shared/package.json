@@ -1,0 +1,23 @@
+{
+  "name": "@axion/shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./schemas/*": "./src/schemas/*.ts",
+    "./types/*": "./src/types/*.ts",
+    "./constants/*": "./src/constants/*.ts"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "lint": "biome check src/",
+    "format": "biome format --write src/"
+  },
+  "dependencies": {
+    "zod": "^3.25.36"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "typescript": "^5.8.3"
+  }
+}

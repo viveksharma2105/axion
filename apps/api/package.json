@@ -1,0 +1,35 @@
+{
+  "name": "api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "build": "bun build src/index.ts --outdir dist --target bun",
+    "start": "bun run dist/index.js",
+    "check-types": "tsc --noEmit",
+    "lint": "biome check src/",
+    "format": "biome format --write src/",
+    "db:migrate": "drizzle-kit migrate",
+    "db:generate": "drizzle-kit generate",
+    "db:seed": "bun run src/infrastructure/database/seed.ts",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@axion/shared": "workspace:*",
+    "hono": "^4.7.11",
+    "drizzle-orm": "^0.44.2",
+    "postgres": "^3.4.7",
+    "ioredis": "^5.7.0",
+    "bullmq": "^5.52.2",
+    "better-auth": "^1.2.10",
+    "zod": "^3.25.36"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/bun": "^1.2.14",
+    "drizzle-kit": "^0.31.1",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.1"
+  }
+}
