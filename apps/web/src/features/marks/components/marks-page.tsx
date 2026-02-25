@@ -18,6 +18,16 @@ import {
 } from "@/components/ui/table";
 import { useMarks, useMarksSummary } from "@/features/marks/hooks/use-marks";
 import { AlertCircle, BarChart3 } from "lucide-react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 export function MarksPage() {
   const { data: marks, isLoading, error, refetch } = useMarks();
@@ -89,6 +99,68 @@ export function MarksPage() {
                 </Card>
               ))}
             </div>
+          )}
+
+          {/* GPA trend chart */}
+          {summary && summary.length > 1 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">GPA Trend</CardTitle>
+                <CardDescription>
+                  SGPA and CGPA progression across semesters
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart
+                    data={summary.map((s) => ({
+                      name: `Sem ${s.semester}`,
+                      sgpa: s.sgpa,
+                      cgpa: s.cgpa,
+                    }))}
+                    margin={{ top: 5, right: 10, left: -10, bottom: 5 }}
+                  >
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      className="stroke-border"
+                    />
+                    <XAxis
+                      dataKey="name"
+                      tick={{ fontSize: 11 }}
+                      className="fill-muted-foreground"
+                    />
+                    <YAxis
+                      domain={[0, 10]}
+                      tick={{ fontSize: 11 }}
+                      className="fill-muted-foreground"
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--card))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "var(--radius)",
+                        color: "hsl(var(--card-foreground))",
+                        fontVariantNumeric: "tabular-nums",
+                      }}
+                      formatter={(value) => [Number(value).toFixed(2)]}
+                    />
+                    <Legend />
+                    <Bar
+                      dataKey="sgpa"
+                      name="SGPA"
+                      fill="hsl(var(--chart-1))"
+                      radius={[4, 4, 0, 0]}
+                    />
+                    <Bar
+                      dataKey="cgpa"
+                      name="CGPA"
+                      fill="hsl(var(--chart-4))"
+                      radius={[4, 4, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
           )}
 
           {/* Marks table */}

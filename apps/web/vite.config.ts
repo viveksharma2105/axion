@@ -27,5 +27,14 @@ export default defineConfig({
   build: {
     outDir: "dist",
     sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          router: ["@tanstack/react-router"],
+          query: ["@tanstack/react-query"],
+          recharts: ["recharts"],
+        },
+      },
+    },
   },
 });

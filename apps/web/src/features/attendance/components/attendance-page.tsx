@@ -22,6 +22,17 @@ import {
 } from "@/features/attendance/hooks/use-attendance";
 import { cn } from "@/lib/utils";
 import { AlertCircle, GraduationCap } from "lucide-react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 export function AttendancePage() {
   const { data: attendance, isLoading, error, refetch } = useAttendance();
@@ -81,6 +92,72 @@ export function AttendancePage() {
               </CardContent>
             </Card>
           </div>
+
+          {/* Attendance bar chart */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Visual Overview</CardTitle>
+              <CardDescription>
+                Attendance percentage by subject
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart
+                  data={attendance.map((r) => ({
+                    name: r.courseCode,
+                    percentage: Math.round(r.percentage * 10) / 10,
+                    threshold: r.threshold,
+                  }))}
+                  margin={{ top: 5, right: 10, left: -10, bottom: 5 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    className="stroke-border"
+                  />
+                  <XAxis
+                    dataKey="name"
+                    tick={{ fontSize: 11 }}
+                    className="fill-muted-foreground font-mono"
+                  />
+                  <YAxis
+                    domain={[0, 100]}
+                    tick={{ fontSize: 11 }}
+                    className="fill-muted-foreground"
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "hsl(var(--card))",
+                      border: "1px solid hsl(var(--border))",
+                      borderRadius: "var(--radius)",
+                      color: "hsl(var(--card-foreground))",
+                      fontVariantNumeric: "tabular-nums",
+                    }}
+                    formatter={(value) => [`${value}%`, "Attendance"]}
+                  />
+                  <Legend />
+                  <Bar
+                    dataKey="percentage"
+                    name="Attendance %"
+                    radius={[4, 4, 0, 0]}
+                  >
+                    {attendance.map((r) => (
+                      <Cell
+                        key={r.courseCode}
+                        fill={
+                          r.percentage >= r.threshold
+                            ? "hsl(var(--chart-1))"
+                            : r.percentage >= r.threshold - 5
+                              ? "hsl(var(--chart-3))"
+                              : "hsl(var(--chart-2))"
+                        }
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
 
           {/* Attendance table */}
           <Card>

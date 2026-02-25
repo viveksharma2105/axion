@@ -1,6 +1,8 @@
-import { NotificationsPage } from "@/features/notifications/components/notifications-page";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, lazyRouteComponent } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/notifications")({
-  component: NotificationsPage,
+  component: lazyRouteComponent(
+    () => import("@/features/notifications/components/notifications-page"),
+    "NotificationsPage",
+  ),
 });

@@ -1,6 +1,8 @@
-import { MarksPage } from "@/features/marks/components/marks-page";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, lazyRouteComponent } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/marks")({
-  component: MarksPage,
+  component: lazyRouteComponent(
+    () => import("@/features/marks/components/marks-page"),
+    "MarksPage",
+  ),
 });
