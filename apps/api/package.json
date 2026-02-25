@@ -10,11 +10,11 @@
     "check-types": "tsc --noEmit",
     "lint": "biome check src/",
     "format": "biome format --write src/",
-    "db:migrate": "drizzle-kit migrate",
-    "db:generate": "drizzle-kit generate",
-    "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio",
-    "db:seed": "bun run src/infrastructure/database/seed.ts",
+    "db:migrate": "bun run --env-file=../../.env drizzle-kit migrate",
+    "db:generate": "bun run --env-file=../../.env drizzle-kit generate",
+    "db:push": "bun run --env-file=../../.env drizzle-kit push",
+    "db:studio": "bun run --env-file=../../.env drizzle-kit studio",
+    "db:seed": "bun run --env-file=../../.env src/infrastructure/database/seed.ts",
     "test": "vitest run"
   },
   "dependencies": {
