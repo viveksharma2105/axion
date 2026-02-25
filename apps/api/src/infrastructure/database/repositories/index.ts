@@ -1,0 +1,8 @@
+export { CollegeRepository } from "./college.repository";
+export { CollegeLinkRepository } from "./college-link.repository";
+export { AttendanceRepository } from "./attendance.repository";
+export { TimetableRepository } from "./timetable.repository";
+export { MarksRepository } from "./marks.repository";
+export { CoursesRepository } from "./courses.repository";
+export { NotificationRepository } from "./notification.repository";
+export { SyncLogRepository } from "./sync-log.repository";
