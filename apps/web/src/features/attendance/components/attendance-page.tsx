@@ -56,7 +56,7 @@ export function AttendancePage() {
       ) : (
         <div className="space-y-6">
           {/* Summary cards */}
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <SummaryCard
               label="Overall"
               value={
@@ -102,65 +102,71 @@ export function AttendancePage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart
-                  data={attendance.map((r) => ({
-                    name: r.courseCode,
-                    percentage: Math.round(r.percentage * 10) / 10,
-                    threshold: r.threshold,
-                  }))}
-                  margin={{ top: 5, right: 10, left: -10, bottom: 5 }}
-                >
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    className="stroke-border"
-                  />
-                  <XAxis
-                    dataKey="name"
-                    tick={{ fontSize: 11 }}
-                    className="fill-muted-foreground font-mono"
-                  />
-                  <YAxis
-                    domain={[0, 100]}
-                    tick={{ fontSize: 11 }}
-                    className="fill-muted-foreground"
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "var(--radius)",
-                      color: "hsl(var(--card-foreground))",
-                      fontVariantNumeric: "tabular-nums",
-                    }}
-                    formatter={(value) => [`${value}%`, "Attendance"]}
-                  />
-                  <Legend />
-                  <Bar
-                    dataKey="percentage"
-                    name="Attendance %"
-                    radius={[4, 4, 0, 0]}
+              <div className="h-[200px] sm:h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={attendance.map((r) => ({
+                      name: r.courseCode,
+                      percentage: Math.round(r.percentage * 10) / 10,
+                      threshold: r.threshold,
+                    }))}
+                    margin={{ top: 5, right: 10, left: -10, bottom: 5 }}
                   >
-                    {attendance.map((r) => (
-                      <Cell
-                        key={r.courseCode}
-                        fill={
-                          r.percentage >= r.threshold
-                            ? "hsl(var(--chart-1))"
-                            : r.percentage >= r.threshold - 5
-                              ? "hsl(var(--chart-3))"
-                              : "hsl(var(--chart-2))"
-                        }
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      className="stroke-border"
+                    />
+                    <XAxis
+                      dataKey="name"
+                      tick={{ fontSize: 10 }}
+                      className="fill-muted-foreground font-mono"
+                      interval={0}
+                      angle={-45}
+                      textAnchor="end"
+                      height={50}
+                    />
+                    <YAxis
+                      domain={[0, 100]}
+                      tick={{ fontSize: 11 }}
+                      className="fill-muted-foreground"
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--card))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "var(--radius)",
+                        color: "hsl(var(--card-foreground))",
+                        fontVariantNumeric: "tabular-nums",
+                      }}
+                      formatter={(value) => [`${value}%`, "Attendance"]}
+                    />
+                    <Legend />
+                    <Bar
+                      dataKey="percentage"
+                      name="Attendance %"
+                      radius={[4, 4, 0, 0]}
+                    >
+                      {attendance.map((r) => (
+                        <Cell
+                          key={r.courseCode}
+                          fill={
+                            r.percentage >= r.threshold
+                              ? "hsl(var(--chart-1))"
+                              : r.percentage >= r.threshold - 5
+                                ? "hsl(var(--chart-3))"
+                                : "hsl(var(--chart-2))"
+                          }
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
             </CardContent>
           </Card>
 
-          {/* Attendance table */}
-          <Card>
+          {/* Attendance table — desktop */}
+          <Card className="hidden sm:block">
             <CardHeader>
               <CardTitle className="text-lg">Subject-wise Breakdown</CardTitle>
               <CardDescription>
@@ -199,7 +205,7 @@ export function AttendancePage() {
                               <span className="font-mono text-sm">
                                 {record.courseCode}
                               </span>
-                              <p className="text-xs text-muted-foreground">
+                              <p className="max-w-[200px] truncate text-xs text-muted-foreground">
                                 {record.courseTitle}
                               </p>
                             </div>
@@ -237,6 +243,61 @@ export function AttendancePage() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Attendance cards — mobile */}
+          <div className="space-y-3 sm:hidden">
+            <h2 className="text-lg font-semibold tracking-tight">
+              Subject-wise Breakdown
+            </h2>
+            {attendance.map((record) => {
+              const projection = projections?.find(
+                (p) => p.courseCode === record.courseCode,
+              );
+              return (
+                <Card key={record.courseCode}>
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <span className="font-mono text-sm">
+                          {record.courseCode}
+                        </span>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {record.courseTitle}
+                        </p>
+                      </div>
+                      <AttendanceBadge
+                        value={record.percentage}
+                        threshold={record.threshold}
+                      />
+                    </div>
+                    <div className="mt-3 flex items-center gap-4 text-sm text-muted-foreground tabular-nums">
+                      <span>
+                        Present:{" "}
+                        <span className="font-medium text-foreground">
+                          {record.present}
+                        </span>
+                      </span>
+                      <span>
+                        Total:{" "}
+                        <span className="font-medium text-foreground">
+                          {record.total}
+                        </span>
+                      </span>
+                    </div>
+                    {projection && (
+                      <p className="mt-2 text-xs text-muted-foreground">
+                        {projection.canSkip > 0
+                          ? `Can skip ${projection.canSkip} classes`
+                          : projection.mustAttend > 0
+                            ? `Need ${projection.mustAttend} more classes`
+                            : "On track"}
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
@@ -302,7 +363,7 @@ function SummaryCard({ label, value, attendance }: SummaryCardProps) {
 function AttendanceSkeleton() {
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 3 }).map((_, i) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton list
           <Card key={i}>

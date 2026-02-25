@@ -6,17 +6,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/lib/api-client";
 import { signOut } from "@/lib/auth-client";
@@ -29,6 +29,7 @@ import {
   Monitor,
   Moon,
   Plus,
+  RefreshCw,
   Sun,
   Trash2,
 } from "lucide-react";
@@ -122,25 +123,28 @@ function CollegeLinkSection() {
               Connect your college portal to sync data
             </CardDescription>
           </div>
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
+          {/* Sheet for mobile-friendly "Link College" form */}
+          <Sheet open={open} onOpenChange={setOpen}>
+            <SheetTrigger asChild>
               <Button size="sm">
                 <Plus className="mr-2 h-4 w-4" />
                 Link College
               </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Link College Account</DialogTitle>
-                <DialogDescription>
+            </SheetTrigger>
+            <SheetContent side="bottom" className="rounded-t-2xl sm:hidden">
+              <SheetHeader>
+                <SheetTitle>Link College Account</SheetTitle>
+                <SheetDescription>
                   Enter your college portal credentials. They are encrypted
                   before storage.
-                </DialogDescription>
-              </DialogHeader>
-              <form
-                className="space-y-4"
-                onSubmit={(e) => {
-                  e.preventDefault();
+                </SheetDescription>
+              </SheetHeader>
+              <LinkCollegeForm
+                username={username}
+                password={password}
+                onUsernameChange={setUsername}
+                onPasswordChange={setPassword}
+                onSubmit={() => {
                   const college = colleges?.[0];
                   if (!college) return;
                   linkMutation.mutate({
@@ -149,48 +153,38 @@ function CollegeLinkSection() {
                     password,
                   });
                 }}
-              >
-                <div className="space-y-2">
-                  <Label htmlFor="username">College Username</Label>
-                  <Input
-                    id="username"
-                    placeholder="e.g., 23CSU337"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    required
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Your college portal login ID
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">College Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-                {linkMutation.error && (
-                  <p className="text-xs text-destructive">
-                    {linkMutation.error.message}
-                  </p>
-                )}
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={linkMutation.isPending}
-                >
-                  {linkMutation.isPending && (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  )}
-                  Link Account
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
+                isPending={linkMutation.isPending}
+                error={linkMutation.error}
+              />
+            </SheetContent>
+            {/* Dialog-style sheet for desktop */}
+            <SheetContent side="right" className="hidden w-[400px] sm:block">
+              <SheetHeader>
+                <SheetTitle>Link College Account</SheetTitle>
+                <SheetDescription>
+                  Enter your college portal credentials. They are encrypted
+                  before storage.
+                </SheetDescription>
+              </SheetHeader>
+              <LinkCollegeForm
+                username={username}
+                password={password}
+                onUsernameChange={setUsername}
+                onPasswordChange={setPassword}
+                onSubmit={() => {
+                  const college = colleges?.[0];
+                  if (!college) return;
+                  linkMutation.mutate({
+                    collegeSlug: college.slug,
+                    username,
+                    password,
+                  });
+                }}
+                isPending={linkMutation.isPending}
+                error={linkMutation.error}
+              />
+            </SheetContent>
+          </Sheet>
         </div>
       </CardHeader>
       <CardContent>
@@ -212,13 +206,13 @@ function CollegeLinkSection() {
               return (
                 <div
                   key={link.id}
-                  className="flex items-center justify-between rounded-lg border p-3"
+                  className="flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between"
                 >
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-sm font-medium">
                       {college?.name ?? link.collegeSlug}
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="truncate text-xs text-muted-foreground">
                       Status: {link.syncStatus}
                       {link.lastSyncedAt &&
                         ` · Last synced: ${new Date(link.lastSyncedAt).toLocaleString()}`}
@@ -234,13 +228,16 @@ function CollegeLinkSection() {
                       {syncMutation.isPending ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
-                        "Sync"
+                        <>
+                          <RefreshCw className="mr-2 h-4 w-4" />
+                          Sync
+                        </>
                       )}
                     </Button>
                     <Button
                       variant="destructive"
                       size="icon"
-                      className="h-8 w-8"
+                      className="h-10 w-10"
                       onClick={() => unlinkMutation.mutate(link.id)}
                       disabled={unlinkMutation.isPending}
                       aria-label="Unlink college"
@@ -255,6 +252,65 @@ function CollegeLinkSection() {
         )}
       </CardContent>
     </Card>
+  );
+}
+
+interface LinkCollegeFormProps {
+  username: string;
+  password: string;
+  onUsernameChange: (value: string) => void;
+  onPasswordChange: (value: string) => void;
+  onSubmit: () => void;
+  isPending: boolean;
+  error: Error | null;
+}
+
+function LinkCollegeForm({
+  username,
+  password,
+  onUsernameChange,
+  onPasswordChange,
+  onSubmit,
+  isPending,
+  error,
+}: LinkCollegeFormProps) {
+  return (
+    <form
+      className="mt-4 space-y-4"
+      onSubmit={(e) => {
+        e.preventDefault();
+        onSubmit();
+      }}
+    >
+      <div className="space-y-2">
+        <Label htmlFor="username">College Username</Label>
+        <Input
+          id="username"
+          placeholder="e.g., 23CSU337"
+          value={username}
+          onChange={(e) => onUsernameChange(e.target.value)}
+          required
+        />
+        <p className="text-xs text-muted-foreground">
+          Your college portal login ID
+        </p>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="password">College Password</Label>
+        <Input
+          id="password"
+          type="password"
+          value={password}
+          onChange={(e) => onPasswordChange(e.target.value)}
+          required
+        />
+      </div>
+      {error && <p className="text-xs text-destructive">{error.message}</p>}
+      <Button type="submit" className="w-full" disabled={isPending}>
+        {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        Link Account
+      </Button>
+    </form>
   );
 }
 
@@ -274,14 +330,14 @@ function ThemeSection() {
         <CardDescription>Choose your preferred theme</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex gap-2">
+        <div className="grid grid-cols-3 gap-2">
           {options.map((opt) => (
             <Button
               key={opt.value}
               variant={theme === opt.value ? "default" : "outline"}
               size="sm"
               onClick={() => setTheme(opt.value)}
-              className="gap-2"
+              className="w-full gap-2"
             >
               <opt.icon className="h-4 w-4" />
               {opt.label}
@@ -303,6 +359,7 @@ function AccountSection() {
       <CardContent>
         <Button
           variant="destructive"
+          className="w-full sm:w-auto"
           onClick={() =>
             signOut({
               fetchOptions: { onSuccess: () => window.location.reload() },

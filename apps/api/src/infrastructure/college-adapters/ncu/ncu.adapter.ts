@@ -312,10 +312,7 @@ function parseDataField<T>(response: NcuApiResponse): T[] {
     try {
       return JSON.parse(rawData) as T[];
     } catch {
-      throw new NcuApiError(
-        "Failed to parse NCU API Data field as JSON",
-        500,
-      );
+      throw new NcuApiError("Failed to parse NCU API Data field as JSON", 500);
     }
   }
 
@@ -387,9 +384,7 @@ function mapAttendanceRow(row: NcuAttendanceRow): AttendanceRecord {
  *
  * CourseDetails format: `"CSC301 -SEMINAR"` (code + space + dash + name)
  */
-export function parseScheduleData(
-  response: NcuApiResponse,
-): TimetableEntry[] {
+export function parseScheduleData(response: NcuApiResponse): TimetableEntry[] {
   const rawData = response.Data;
 
   if (rawData == null) {
@@ -468,9 +463,7 @@ function mapCourseRow(row: NcuCourseRow): CourseRecord {
  * session/semester info. The actual detailed grade sheet (DGS) is a PDF
  * and cannot be parsed into structured mark records.
  */
-export function parseResultSummaryData(
-  response: NcuApiResponse,
-): MarkRecord[] {
+export function parseResultSummaryData(response: NcuApiResponse): MarkRecord[] {
   const rows = parseDataField<NcuResultSummaryRow>(response);
   return rows.map(mapResultSummaryRow);
 }
@@ -489,9 +482,7 @@ function mapResultSummaryRow(row: NcuResultSummaryRow): MarkRecord {
 /**
  * Parse date sheet response.
  */
-export function parseDateSheetData(
-  response: NcuApiResponse,
-): DateSheetEntry[] {
+export function parseDateSheetData(response: NcuApiResponse): DateSheetEntry[] {
   const rows = parseDataField<NcuDateSheetRow>(response);
   return rows.map(mapDateSheetRow);
 }

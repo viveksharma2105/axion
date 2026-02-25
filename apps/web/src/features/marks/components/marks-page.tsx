@@ -1,4 +1,5 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -111,60 +112,62 @@ export function MarksPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart
-                    data={summary.map((s) => ({
-                      name: `Sem ${s.semester}`,
-                      sgpa: s.sgpa,
-                      cgpa: s.cgpa,
-                    }))}
-                    margin={{ top: 5, right: 10, left: -10, bottom: 5 }}
-                  >
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      className="stroke-border"
-                    />
-                    <XAxis
-                      dataKey="name"
-                      tick={{ fontSize: 11 }}
-                      className="fill-muted-foreground"
-                    />
-                    <YAxis
-                      domain={[0, 10]}
-                      tick={{ fontSize: 11 }}
-                      className="fill-muted-foreground"
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "hsl(var(--card))",
-                        border: "1px solid hsl(var(--border))",
-                        borderRadius: "var(--radius)",
-                        color: "hsl(var(--card-foreground))",
-                        fontVariantNumeric: "tabular-nums",
-                      }}
-                      formatter={(value) => [Number(value).toFixed(2)]}
-                    />
-                    <Legend />
-                    <Bar
-                      dataKey="sgpa"
-                      name="SGPA"
-                      fill="hsl(var(--chart-1))"
-                      radius={[4, 4, 0, 0]}
-                    />
-                    <Bar
-                      dataKey="cgpa"
-                      name="CGPA"
-                      fill="hsl(var(--chart-4))"
-                      radius={[4, 4, 0, 0]}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
+                <div className="h-[200px] sm:h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={summary.map((s) => ({
+                        name: `Sem ${s.semester}`,
+                        sgpa: s.sgpa,
+                        cgpa: s.cgpa,
+                      }))}
+                      margin={{ top: 5, right: 10, left: -10, bottom: 5 }}
+                    >
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        className="stroke-border"
+                      />
+                      <XAxis
+                        dataKey="name"
+                        tick={{ fontSize: 11 }}
+                        className="fill-muted-foreground"
+                      />
+                      <YAxis
+                        domain={[0, 10]}
+                        tick={{ fontSize: 11 }}
+                        className="fill-muted-foreground"
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "hsl(var(--card))",
+                          border: "1px solid hsl(var(--border))",
+                          borderRadius: "var(--radius)",
+                          color: "hsl(var(--card-foreground))",
+                          fontVariantNumeric: "tabular-nums",
+                        }}
+                        formatter={(value) => [Number(value).toFixed(2)]}
+                      />
+                      <Legend />
+                      <Bar
+                        dataKey="sgpa"
+                        name="SGPA"
+                        fill="hsl(var(--chart-1))"
+                        radius={[4, 4, 0, 0]}
+                      />
+                      <Bar
+                        dataKey="cgpa"
+                        name="CGPA"
+                        fill="hsl(var(--chart-4))"
+                        radius={[4, 4, 0, 0]}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
               </CardContent>
             </Card>
           )}
 
-          {/* Marks table */}
-          <Card>
+          {/* Marks table — desktop */}
+          <Card className="hidden sm:block">
             <CardHeader>
               <CardTitle className="text-lg">Detailed Marks</CardTitle>
               <CardDescription>
@@ -196,7 +199,7 @@ export function MarksPage() {
                             <span className="font-mono text-sm">
                               {record.courseCode}
                             </span>
-                            <p className="text-xs text-muted-foreground">
+                            <p className="max-w-[200px] truncate text-xs text-muted-foreground">
                               {record.courseTitle}
                             </p>
                           </div>
@@ -217,6 +220,40 @@ export function MarksPage() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Marks cards — mobile */}
+          <div className="space-y-3 sm:hidden">
+            <h2 className="text-lg font-semibold tracking-tight">
+              Detailed Marks
+            </h2>
+            {marks.map((record, i) => (
+              <Card key={`${record.courseCode}-${record.examType}-${i}`}>
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <span className="font-mono text-sm">
+                        {record.courseCode}
+                      </span>
+                      <p className="truncate text-xs text-muted-foreground">
+                        {record.courseTitle}
+                      </p>
+                    </div>
+                    <Badge variant="outline" className="shrink-0 tabular-nums">
+                      Sem {record.semester}
+                    </Badge>
+                  </div>
+                  <div className="mt-3 flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">
+                      {record.examType}
+                    </span>
+                    <span className="font-medium tabular-nums">
+                      {record.marksObtained}/{record.maxMarks}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       )}
     </div>

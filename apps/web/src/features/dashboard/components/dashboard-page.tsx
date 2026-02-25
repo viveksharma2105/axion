@@ -218,7 +218,7 @@ function DashboardContent() {
       </div>
 
       {/* Second row: Today's schedule + attendance chart */}
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2">
         <TodayScheduleCard
           schedule={todaySchedule ?? null}
           isLoading={scheduleLoading}
@@ -253,29 +253,29 @@ function StatCard({
   children,
 }: StatCardProps) {
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        <Icon className="h-4 w-4 text-muted-foreground" />
-      </CardHeader>
-      <CardContent>
-        {isLoading ? (
-          <>
-            <Skeleton className="mb-2 h-8 w-20" />
-            <Skeleton className="h-3 w-16" />
-          </>
-        ) : (
-          <div className="space-y-1">
-            {children}
-            <Link to={linkTo}>
-              <p className="text-xs text-muted-foreground transition-colors hover:text-foreground">
+    <Link to={linkTo} className="block">
+      <Card className="transition-colors hover:bg-muted/50">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">{title}</CardTitle>
+          <Icon className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <>
+              <Skeleton className="mb-2 h-8 w-20" />
+              <Skeleton className="h-3 w-16" />
+            </>
+          ) : (
+            <div className="space-y-1">
+              {children}
+              <p className="text-xs text-muted-foreground">
                 {linkLabel} &rarr;
               </p>
-            </Link>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </Link>
   );
 }
 
@@ -333,7 +333,7 @@ function TodayScheduleCard({ schedule, isLoading }: TodayScheduleCardProps) {
                 key={entry.id}
                 className="flex items-center gap-3 rounded-lg border p-3"
               >
-                <div className="flex-shrink-0 text-center">
+                <div className="shrink-0 text-center">
                   <p className="text-sm font-semibold tabular-nums">
                     {entry.startTime}
                   </p>
@@ -414,7 +414,7 @@ function AttendanceChartCard({
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <Skeleton className="h-[250px] w-full" />
+          <Skeleton className="h-[200px] w-full sm:h-[300px]" />
         ) : chartData.length === 0 ? (
           <div className="flex flex-col items-center py-6 text-center">
             <GraduationCap className="h-8 w-8 text-muted-foreground" />
@@ -423,47 +423,56 @@ function AttendanceChartCard({
             </p>
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height={250}>
-            <BarChart
-              data={chartData}
-              margin={{ top: 5, right: 10, left: -10, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-              <XAxis
-                dataKey="name"
-                tick={{ fontSize: 11 }}
-                className="fill-muted-foreground font-mono"
-              />
-              <YAxis
-                domain={[0, 100]}
-                tick={{ fontSize: 11 }}
-                className="fill-muted-foreground"
-              />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "hsl(var(--card))",
-                  border: "1px solid hsl(var(--border))",
-                  borderRadius: "var(--radius)",
-                  color: "hsl(var(--card-foreground))",
-                  fontVariantNumeric: "tabular-nums",
-                }}
-                formatter={(value) => [`${value}%`, "Attendance"]}
-              />
-              <Legend />
-              <Bar
-                dataKey="percentage"
-                name="Attendance %"
-                radius={[4, 4, 0, 0]}
+          <div className="h-[200px] sm:h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={chartData}
+                margin={{ top: 5, right: 10, left: -10, bottom: 5 }}
               >
-                {chartData.map((entry) => (
-                  <Cell
-                    key={entry.name}
-                    fill={getBarColor(entry.percentage, entry.threshold)}
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  className="stroke-border"
+                />
+                <XAxis
+                  dataKey="name"
+                  tick={{ fontSize: 10 }}
+                  className="fill-muted-foreground font-mono"
+                  interval={0}
+                  angle={-45}
+                  textAnchor="end"
+                  height={50}
+                />
+                <YAxis
+                  domain={[0, 100]}
+                  tick={{ fontSize: 11 }}
+                  className="fill-muted-foreground"
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: "var(--radius)",
+                    color: "hsl(var(--card-foreground))",
+                    fontVariantNumeric: "tabular-nums",
+                  }}
+                  formatter={(value) => [`${value}%`, "Attendance"]}
+                />
+                <Legend />
+                <Bar
+                  dataKey="percentage"
+                  name="Attendance %"
+                  radius={[4, 4, 0, 0]}
+                >
+                  {chartData.map((entry) => (
+                    <Cell
+                      key={entry.name}
+                      fill={getBarColor(entry.percentage, entry.threshold)}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         )}
       </CardContent>
     </Card>
@@ -495,47 +504,49 @@ function GpaTrendCard({ summary }: { summary: GpaSummary[] }) {
         <CardDescription>SGPA and CGPA across semesters</CardDescription>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={250}>
-          <BarChart
-            data={chartData}
-            margin={{ top: 5, right: 10, left: -10, bottom: 5 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-            <XAxis
-              dataKey="name"
-              tick={{ fontSize: 11 }}
-              className="fill-muted-foreground"
-            />
-            <YAxis
-              domain={[0, 10]}
-              tick={{ fontSize: 11 }}
-              className="fill-muted-foreground"
-            />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "hsl(var(--card))",
-                border: "1px solid hsl(var(--border))",
-                borderRadius: "var(--radius)",
-                color: "hsl(var(--card-foreground))",
-                fontVariantNumeric: "tabular-nums",
-              }}
-              formatter={(value) => [Number(value).toFixed(2)]}
-            />
-            <Legend />
-            <Bar
-              dataKey="sgpa"
-              name="SGPA"
-              fill="hsl(var(--chart-1))"
-              radius={[4, 4, 0, 0]}
-            />
-            <Bar
-              dataKey="cgpa"
-              name="CGPA"
-              fill="hsl(var(--chart-4))"
-              radius={[4, 4, 0, 0]}
-            />
-          </BarChart>
-        </ResponsiveContainer>
+        <div className="h-[200px] sm:h-[300px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={chartData}
+              margin={{ top: 5, right: 10, left: -10, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+              <XAxis
+                dataKey="name"
+                tick={{ fontSize: 11 }}
+                className="fill-muted-foreground"
+              />
+              <YAxis
+                domain={[0, 10]}
+                tick={{ fontSize: 11 }}
+                className="fill-muted-foreground"
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "hsl(var(--card))",
+                  border: "1px solid hsl(var(--border))",
+                  borderRadius: "var(--radius)",
+                  color: "hsl(var(--card-foreground))",
+                  fontVariantNumeric: "tabular-nums",
+                }}
+                formatter={(value) => [Number(value).toFixed(2)]}
+              />
+              <Legend />
+              <Bar
+                dataKey="sgpa"
+                name="SGPA"
+                fill="hsl(var(--chart-1))"
+                radius={[4, 4, 0, 0]}
+              />
+              <Bar
+                dataKey="cgpa"
+                name="CGPA"
+                fill="hsl(var(--chart-4))"
+                radius={[4, 4, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </CardContent>
     </Card>
   );
@@ -558,7 +569,7 @@ function DashboardSkeleton() {
           </Card>
         ))}
       </div>
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>
             <Skeleton className="h-5 w-40" />
@@ -577,7 +588,7 @@ function DashboardSkeleton() {
             <Skeleton className="h-4 w-56" />
           </CardHeader>
           <CardContent>
-            <Skeleton className="h-[250px] w-full" />
+            <Skeleton className="h-[200px] w-full sm:h-[300px]" />
           </CardContent>
         </Card>
       </div>

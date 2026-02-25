@@ -103,11 +103,17 @@ export function TimetablePage() {
               <Tabs defaultValue={String(today === 0 ? 1 : today)}>
                 <TabsList className="w-full justify-start overflow-x-auto">
                   {DAYS.slice(1, 6).map((day, i) => (
-                    <TabsTrigger key={day} value={String(i + 1)}>
+                    <TabsTrigger
+                      key={day}
+                      value={String(i + 1)}
+                      className="min-h-10"
+                    >
                       {day.slice(0, 3)}
                     </TabsTrigger>
                   ))}
-                  <TabsTrigger value="6">Sat</TabsTrigger>
+                  <TabsTrigger value="6" className="min-h-10">
+                    Sat
+                  </TabsTrigger>
                 </TabsList>
                 {[1, 2, 3, 4, 5, 6].map((dayNum) => {
                   const dayEntries = timetable.filter(
@@ -157,15 +163,15 @@ interface ScheduleItemProps {
 function ScheduleItem({ entry }: ScheduleItemProps) {
   return (
     <div className="flex items-center gap-4 rounded-lg border p-3">
-      <div className="text-center">
+      <div className="shrink-0 text-center">
         <p className="text-sm font-semibold tabular-nums">{entry.startTime}</p>
         <p className="text-xs text-muted-foreground tabular-nums">
           {entry.endTime}
         </p>
       </div>
       <div className="h-10 w-px bg-border" />
-      <div className="flex-1">
-        <p className="font-medium">{entry.courseTitle}</p>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium">{entry.courseTitle}</p>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <span className="font-mono">{entry.courseCode}</span>
           {entry.room && (

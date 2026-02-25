@@ -25,17 +25,26 @@ import {
   GraduationCap,
   Home,
   Menu,
+  MoreHorizontal,
   Settings,
 } from "lucide-react";
+import { useState } from "react";
 import type { ReactNode } from "react";
 
-const navItems = [
+const primaryNavItems = [
   { to: "/", icon: Home, label: "Home" },
   { to: "/attendance", icon: GraduationCap, label: "Attendance" },
   { to: "/timetable", icon: Calendar, label: "Schedule" },
   { to: "/marks", icon: BarChart3, label: "Marks" },
-  { to: "/courses", icon: BookOpen, label: "Courses" },
 ] as const;
+
+const moreNavItems = [
+  { to: "/courses", icon: BookOpen, label: "Courses" },
+  { to: "/notifications", icon: Bell, label: "Notifications" },
+  { to: "/settings", icon: Settings, label: "Settings" },
+] as const;
+
+const allNavItems = [...primaryNavItems, ...moreNavItems] as const;
 
 const secondaryNavItems = [
   { to: "/notifications", icon: Bell, label: "Notifications" },
@@ -75,6 +84,11 @@ function DesktopSidebar() {
   const router = useRouter();
   const currentPath = router.state.location.pathname;
 
+  const desktopPrimaryItems = [
+    ...primaryNavItems,
+    { to: "/courses", icon: BookOpen, label: "Courses" },
+  ] as const;
+
   return (
     <aside className="hidden w-64 flex-shrink-0 border-r border-sidebar-border bg-sidebar lg:block">
       <div className="flex h-full flex-col">
@@ -90,7 +104,7 @@ function DesktopSidebar() {
 
         {/* Primary nav */}
         <nav className="flex-1 space-y-1 px-3 py-4">
-          {navItems.map((item) => (
+          {desktopPrimaryItems.map((item) => (
             <Tooltip key={item.to}>
               <TooltipTrigger asChild>
                 <Link
@@ -191,7 +205,7 @@ function MobileHeader() {
               <SheetTitle>Menu</SheetTitle>
             </SheetHeader>
             <nav className="mt-4 space-y-1">
-              {[...navItems, ...secondaryNavItems].map((item) => (
+              {allNavItems.map((item) => (
                 <Link
                   key={item.to}
                   to={item.to}
@@ -242,6 +256,9 @@ function MobileHeader() {
 function MobileBottomNav() {
   const router = useRouter();
   const currentPath = router.state.location.pathname;
+  const [moreOpen, setMoreOpen] = useState(false);
+
+  const isMoreActive = moreNavItems.some((item) => currentPath === item.to);
 
   return (
     <nav
@@ -249,12 +266,12 @@ function MobileBottomNav() {
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <div className="flex h-16 items-center justify-around">
-        {navItems.map((item) => (
+        {primaryNavItems.map((item) => (
           <Link
             key={item.to}
             to={item.to}
             className={cn(
-              "flex h-10 w-10 flex-col items-center justify-center gap-0.5 rounded-lg text-xs transition-colors",
+              "flex flex-col items-center justify-center gap-0.5 rounded-lg px-3 py-1.5 text-xs transition-colors",
               currentPath === item.to
                 ? "text-primary"
                 : "text-muted-foreground hover:text-foreground",
@@ -262,9 +279,51 @@ function MobileBottomNav() {
             aria-label={item.label}
           >
             <item.icon className="h-5 w-5" />
-            <span className="text-[10px] leading-none">{item.label}</span>
+            <span className="text-xs leading-none">{item.label}</span>
           </Link>
         ))}
+
+        {/* More button opens sheet with remaining items */}
+        <Sheet open={moreOpen} onOpenChange={setMoreOpen}>
+          <SheetTrigger asChild>
+            <button
+              type="button"
+              className={cn(
+                "flex flex-col items-center justify-center gap-0.5 rounded-lg px-3 py-1.5 text-xs transition-colors",
+                isMoreActive
+                  ? "text-primary"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+              aria-label="More"
+            >
+              <MoreHorizontal className="h-5 w-5" />
+              <span className="text-xs leading-none">More</span>
+            </button>
+          </SheetTrigger>
+          <SheetContent side="bottom" className="rounded-t-2xl">
+            <SheetHeader>
+              <SheetTitle>More</SheetTitle>
+            </SheetHeader>
+            <nav className="mt-4 space-y-1 pb-4">
+              {moreNavItems.map((item) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  onClick={() => setMoreOpen(false)}
+                  className={cn(
+                    "flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-colors",
+                    currentPath === item.to
+                      ? "bg-accent text-accent-foreground"
+                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                  )}
+                >
+                  <item.icon className="h-5 w-5" />
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          </SheetContent>
+        </Sheet>
       </div>
     </nav>
   );

@@ -77,7 +77,8 @@ export function CoursesPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto rounded-md border">
+            {/* Desktop table */}
+            <div className="hidden overflow-x-auto rounded-md border sm:block">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -95,7 +96,9 @@ export function CoursesPage() {
                       <TableCell className="font-mono text-sm">
                         {course.courseCode}
                       </TableCell>
-                      <TableCell>{course.courseTitle}</TableCell>
+                      <TableCell className="max-w-[250px] truncate">
+                        {course.courseTitle}
+                      </TableCell>
                       <TableCell>
                         <Badge variant="secondary" className="text-xs">
                           {course.courseType}
@@ -108,6 +111,32 @@ export function CoursesPage() {
                   ))}
                 </TableBody>
               </Table>
+            </div>
+
+            {/* Mobile card list */}
+            <div className="space-y-3 sm:hidden">
+              {courses.map((course) => (
+                <div key={course.courseCode} className="rounded-lg border p-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <span className="font-mono text-sm">
+                        {course.courseCode}
+                      </span>
+                      <p className="truncate text-sm text-muted-foreground">
+                        {course.courseTitle}
+                      </p>
+                    </div>
+                    <span className="shrink-0 text-sm font-medium tabular-nums">
+                      {course.credits.toFixed(1)} cr
+                    </span>
+                  </div>
+                  <div className="mt-2">
+                    <Badge variant="secondary" className="text-xs">
+                      {course.courseType}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>

@@ -22,7 +22,7 @@ export function NotificationsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Notifications</h1>
           <p className="text-muted-foreground">
@@ -37,6 +37,7 @@ export function NotificationsPage() {
             size="sm"
             onClick={() => markAllRead.mutate()}
             disabled={markAllRead.isPending}
+            className="w-full sm:w-auto"
           >
             <CheckCheck className="mr-2 h-4 w-4" />
             Mark all read
@@ -87,10 +88,7 @@ export function NotificationsPage() {
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-medium">{notification.title}</p>
                     {!notification.isRead && (
-                      <Badge
-                        variant="default"
-                        className="h-5 px-1.5 text-[10px]"
-                      >
+                      <Badge variant="default" className="h-5 px-1.5 text-xs">
                         New
                       </Badge>
                     )}
@@ -108,7 +106,7 @@ export function NotificationsPage() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 shrink-0"
+                    className="h-10 w-10 shrink-0"
                     onClick={() => markRead.mutate(notification.id)}
                     disabled={markRead.isPending}
                     aria-label="Mark as read"
