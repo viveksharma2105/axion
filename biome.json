@@ -40,7 +40,8 @@
       "dist",
       ".turbo",
       "*.min.js",
-      "bun.lock"
+      "bun.lock",
+      "**/routeTree.gen.ts"
     ]
   }
 }
