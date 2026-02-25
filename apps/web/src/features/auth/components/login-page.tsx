@@ -20,7 +20,7 @@ export function LoginPage() {
     try {
       await signIn.social({
         provider: "google",
-        callbackURL: "/",
+        callbackURL: window.location.origin,
       });
     } catch {
       setIsLoading(false);
