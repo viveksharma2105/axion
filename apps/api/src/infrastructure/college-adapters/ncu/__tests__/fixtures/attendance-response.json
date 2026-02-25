@@ -1,46 +1,7 @@
 {
-  "Data": [
-    {
-      "CourseCode": "CSE101",
-      "CourseName": "Introduction to Computer Science",
-      "TotalLectures": 40,
-      "TotalPresent": 35,
-      "TotalAbsent": 3,
-      "LOA": 1,
-      "OnDuty": 1,
-      "Percentage": 87.5
-    },
-    {
-      "CourseCode": "MAT201",
-      "CourseName": "Discrete Mathematics",
-      "TotalLectures": 36,
-      "TotalPresent": 30,
-      "TotalAbsent": 4,
-      "LOA": 2,
-      "OnDuty": 0,
-      "Percentage": 83.33
-    },
-    {
-      "CourseCode": "PHY102",
-      "CourseName": "Engineering Physics",
-      "TotalLectures": 30,
-      "TotalPresent": 20,
-      "TotalAbsent": 8,
-      "LOA": 1,
-      "OnDuty": 1,
-      "Percentage": 66.67
-    },
-    {
-      "CourseCode": "ENG101",
-      "CourseName": "Technical Communication",
-      "TotalLectures": 25,
-      "TotalPresent": 24,
-      "TotalAbsent": 0,
-      "LOA": 0,
-      "OnDuty": 1,
-      "Percentage": 96.0
-    }
-  ],
-  "Message": "Success",
-  "Status": true
+  "Data": "[{\"CourseCode\":\"CLV210\",\"CourseName\":\"SOFT SKILLS - A CAREER CATALYST (VA-II)\",\"TotalLectures\":4,\"TotalPresent\":4,\"TotalAbsent\":0,\"TotalLOA\":0,\"TotalOnDuty\":0,\"Percentage1\":100.00},{\"CourseCode\":\"CSC301\",\"CourseName\":\"SEMINAR\",\"TotalLectures\":11,\"TotalPresent\":9,\"TotalAbsent\":2,\"TotalLOA\":0,\"TotalOnDuty\":0,\"Percentage1\":81.82},{\"CourseCode\":\"CSL318\",\"CourseName\":\"THEORY OF COMPUTATION\",\"TotalLectures\":16,\"TotalPresent\":13,\"TotalAbsent\":3,\"TotalLOA\":0,\"TotalOnDuty\":0,\"Percentage1\":81.25},{\"CourseCode\":\"CSL373\",\"CourseName\":\"DEVOPS\",\"TotalLectures\":33,\"TotalPresent\":28,\"TotalAbsent\":5,\"TotalLOA\":0,\"TotalOnDuty\":0,\"Percentage1\":84.85},{\"CourseCode\":\"CSR319\",\"CourseName\":\"GENERAL PROFICIENCY VI\",\"TotalLectures\":3,\"TotalPresent\":3,\"TotalAbsent\":0,\"TotalLOA\":0,\"TotalOnDuty\":0,\"Percentage1\":100.00},{\"CourseCode\":\"MME001\",\"CourseName\":\"MENTOR-MENTEE ENGAGMENT\",\"TotalLectures\":3,\"TotalPresent\":2,\"TotalAbsent\":1,\"TotalLOA\":0,\"TotalOnDuty\":0,\"Percentage1\":66.67}]",
+  "FileName": null,
+  "StatusCode": 200,
+  "Message": "",
+  "Succeeded": true
 }

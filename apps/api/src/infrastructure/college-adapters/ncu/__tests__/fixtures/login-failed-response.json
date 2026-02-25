@@ -1,5 +1,7 @@
 {
-  "Message": "Invalid User Name or Password",
-  "Status": false,
-  "Token": null
+  "Data": null,
+  "FileName": null,
+  "StatusCode": 200,
+  "Message": "Invalid Username and Password",
+  "Succeeded": false
 }

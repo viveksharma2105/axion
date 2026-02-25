@@ -1,7 +1,8 @@
 {
-  "Token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxMjM0NTYiLCJleHAiOjE3MzAwMDAwMDB9.dummy-signature",
-  "EncodedId": "MTIzNDU2",
-  "UserId": "123456",
-  "Message": "Login Successful",
-  "Status": true
+  "token": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJJZCI6ImR1bW15LWlkIiwic3ViIjoiMTAwMDAwIiwiZW1haWwiOiIyM0NTVTM0MyIsImp0aSI6ImR1bW15LWp0aSIsIm5iZiI6MTc3MDAwMDAwMCwiZXhwIjoxNzcwMDAzNjAwLCJpYXQiOjE3NzAwMDAwMDAsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjcxOTQvIiwiYXVkIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NzE5NC8ifQ.dummy-signature",
+  "User": {
+    "UserId": "UbJNwqAjguPyZVN3hR2IYcu5y9K5GpJNP_-ZJudZ8Z0=",
+    "Name": "23CSU343",
+    "Details": ""
+  }
 }

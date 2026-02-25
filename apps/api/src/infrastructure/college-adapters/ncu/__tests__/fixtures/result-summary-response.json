@@ -1,0 +1,7 @@
+{
+  "Data": "[{\"SessionDetails\":\"Jul-Dec - 2024\",\"SemesterNo\":3,\"Session\":19},{\"SessionDetails\":\"Jan-Jun - 2025\",\"SemesterNo\":4,\"Session\":20},{\"SessionDetails\":\"Jul-Dec - 2025\",\"SemesterNo\":5,\"Session\":23}]",
+  "FileName": null,
+  "StatusCode": 200,
+  "Message": "",
+  "Succeeded": true
+}

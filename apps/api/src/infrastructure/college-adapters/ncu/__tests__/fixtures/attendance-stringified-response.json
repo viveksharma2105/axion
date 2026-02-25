@@ -1,5 +1,0 @@
-{
-  "Data": "[{\"CourseCode\":\"CSE101\",\"CourseName\":\"Introduction to Computer Science\",\"TotalLectures\":40,\"TotalPresent\":35,\"TotalAbsent\":3,\"LOA\":1,\"OnDuty\":1,\"Percentage\":87.5}]",
-  "Message": "Success",
-  "Status": true
-}

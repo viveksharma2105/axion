@@ -1,0 +1,7 @@
+{
+  "Data": "[{\"CourseCode\":\"CSL236\",\"CourseName\":\"INTRODUCTION TO AI & ML\",\"Examdates\":\"04-Dec-2025\",\"StartTiming\":\"01:30 AM\",\"EndTiming\":\"04:30 AM\",\"RoomName\":null,\"SlotNo\":2,\"ExamDate\":\"2025-12-04T00:00:00\",\"SeatNo\":null,\"SeatingRow\":null,\"SeatingDesk\":null},{\"CourseCode\":\"CSL303\",\"CourseName\":\"OPERATING SYSTEM\",\"Examdates\":\"08-Dec-2025\",\"StartTiming\":\"01:30 AM\",\"EndTiming\":\"04:30 AM\",\"RoomName\":null,\"SlotNo\":2,\"ExamDate\":\"2025-12-08T00:00:00\",\"SeatNo\":null,\"SeatingRow\":null,\"SeatingDesk\":null},{\"CourseCode\":\"CSL209\",\"CourseName\":\"DATA STRUCTURES\",\"Examdates\":\"15-Dec-2025\",\"StartTiming\":\"09:30 AM\",\"EndTiming\":\"12:30 PM\",\"RoomName\":null,\"SlotNo\":1,\"ExamDate\":\"2025-12-15T00:00:00\",\"SeatNo\":null,\"SeatingRow\":null,\"SeatingDesk\":null}]",
+  "FileName": null,
+  "StatusCode": 200,
+  "Message": "",
+  "Succeeded": true
+}
