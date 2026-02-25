@@ -20,6 +20,8 @@ export interface CollegeAuthResult {
   expiresAt?: Date;
   /** Opaque user ID from the college system (e.g., NCU's encoded ID) */
   collegeUserId?: string;
+  /** Display name returned by the college system */
+  displayName?: string;
   rawResponse?: unknown;
 }
 
@@ -36,6 +38,8 @@ export interface AttendanceRecord {
 }
 
 export interface TimetableEntry {
+  /** ISO date string "YYYY-MM-DD" for the specific lecture date */
+  date: string;
   /** 0 = Sunday, 1 = Monday, …, 6 = Saturday */
   dayOfWeek: number;
   /** "HH:mm" format */
@@ -59,7 +63,8 @@ export interface MarkRecord {
   grade?: string;
   sgpa?: number;
   cgpa?: number;
-  semester?: string;
+  semester?: number;
+  sessionName?: string;
   raw?: unknown;
 }
 
@@ -67,9 +72,42 @@ export interface CourseRecord {
   courseCode: string;
   courseName: string;
   credits?: number;
-  facultyName?: string;
+  courseNature?: string;
+  courseDeliveryMode?: string;
+  electiveType?: string;
+  /** "L-T-P" format, e.g., "3-0-2" */
+  ltp?: string;
+  semester?: number;
+  rollNo?: string;
+  raw?: unknown;
+}
+
+export interface DateSheetEntry {
+  courseCode: string;
+  courseName: string;
+  /** ISO date string "YYYY-MM-DD" */
+  examDate: string;
+  /** Human-readable date, e.g., "04-Dec-2025" */
+  examDateFormatted: string;
+  startTime: string;
+  endTime: string;
+  room?: string;
+  slotNo?: number;
+  seatNo?: string;
+  raw?: unknown;
+}
+
+export interface StudentProfile {
+  rollNo: string;
+  studentName: string;
+  semester: number;
+  programmeName: string;
+  degreeLevel: string;
+  fatherName?: string;
+  mobileNo?: string;
   section?: string;
-  semester?: string;
+  /** Base64-encoded JPEG image (without data URI prefix) */
+  studentImage?: string;
   raw?: unknown;
 }
 
@@ -99,6 +137,12 @@ export interface CollegeAdapter {
 
   /** Fetch registered courses */
   getCourses(auth: CollegeAuthResult): Promise<CourseRecord[]>;
+
+  /** Fetch exam date sheet (optional — not all colleges expose this) */
+  getDateSheet?(auth: CollegeAuthResult): Promise<DateSheetEntry[]>;
+
+  /** Fetch student profile details (optional) */
+  getStudentProfile?(auth: CollegeAuthResult): Promise<StudentProfile>;
 
   /** Check if token is still valid (optional optimization) */
   isTokenValid?(auth: CollegeAuthResult): Promise<boolean>;
