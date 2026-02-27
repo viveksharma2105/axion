@@ -55,7 +55,7 @@ export async function startCronScheduler(): Promise<void> {
     {},
     {
       repeat: { pattern: cronSchedule },
-      jobId: "cron:scheduleSyncAll",
+      jobId: "cron-scheduleSyncAll",
     },
   );
 

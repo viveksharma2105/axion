@@ -1,7 +1,4 @@
 import { createApp } from "@/http/app";
-import { createTriggerManualSyncUseCase } from "@/http/container";
-import { authMiddleware } from "@/http/middleware/auth";
-import type { AuthVariables } from "@/http/middleware/auth";
 import { registerAdapters } from "@/infrastructure/college-adapters";
 import {
   createNotificationWorker,
@@ -9,28 +6,15 @@ import {
   enqueueSyncJob,
   startCronScheduler,
 } from "@/infrastructure/jobs";
-import { Hono } from "hono";
 
 // ─── Register college adapters at startup ────────────────────────────────────
 registerAdapters();
 
-// ─── Create app (pass enqueueSyncJob so linking triggers initial sync) ───────
+// ─── Create app ──────────────────────────────────────────────────────────────
+// Pass enqueueSyncJob so that:
+// 1. POST /college-links triggers initial sync after linking
+// 2. POST /college-links/:id/sync enqueues a manual sync job
 const app = createApp(enqueueSyncJob);
-
-// ─── Wire up manual sync route (needs BullMQ enqueueSyncJob) ─────────────────
-const triggerManualSyncUseCase = createTriggerManualSyncUseCase(enqueueSyncJob);
-
-const syncRoute = new Hono<{ Variables: AuthVariables }>()
-  .use("*", authMiddleware)
-  .post("/:id/sync", async (c) => {
-    const userId = c.get("userId");
-    const collegeLinkId = c.req.param("id");
-
-    await triggerManualSyncUseCase.execute(collegeLinkId, userId);
-    return c.json({ data: { success: true, message: "Sync job enqueued" } });
-  });
-
-app.route("/api/college-links", syncRoute);
 
 // ─── Start BullMQ workers ────────────────────────────────────────────────────
 createSyncWorker();

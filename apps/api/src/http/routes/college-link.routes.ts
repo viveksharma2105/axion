@@ -1,4 +1,5 @@
 import {
+  createTriggerManualSyncUseCase,
   getCollegeLinksUseCase,
   linkCollegeUseCase,
   unlinkCollegeUseCase,
@@ -11,19 +12,28 @@ import { Hono } from "hono";
 /**
  * Factory to create college link routes.
  *
- * Accepts an optional `enqueueSyncJob` so the POST handler can trigger
- * an initial sync immediately after linking. When not provided (e.g., in
- * tests), linking still works but no sync is enqueued.
+ * Accepts an optional `enqueueSyncJob` so that:
+ * 1. POST / (link) can trigger an initial sync immediately
+ * 2. POST /:id/sync (manual sync) can enqueue a sync job
+ *
+ * When not provided (e.g., in tests), linking/sync still works but
+ * no background jobs are enqueued.
+ *
+ * IMPORTANT: All routes live on this single Hono sub-app so that the
+ * parent app's `onError(errorHandler)` catches all errors (domain errors,
+ * auth errors, BullMQ errors, etc.) and maps them to proper HTTP responses.
+ * Previously the sync route was a separate Hono instance mounted in index.ts,
+ * which meant errors bypassed the global error handler → 500.
  *
  * GET    /             — list user's linked colleges
  * POST   /             — link a new college account (+ enqueue initial sync)
  * DELETE /:id          — unlink a college account
- * POST   /:id/sync     — trigger manual sync (wired in index.ts after BullMQ init)
+ * POST   /:id/sync     — trigger manual sync
  */
 export function createCollegeLinkRoutes(
   enqueueSyncJob?: (collegeLinkId: string) => Promise<void>,
 ) {
-  return new Hono<{ Variables: AuthVariables }>()
+  const routes = new Hono<{ Variables: AuthVariables }>()
     .use("*", authMiddleware)
     .get("/", async (c) => {
       const userId = c.get("userId");
@@ -85,6 +95,23 @@ export function createCollegeLinkRoutes(
       await unlinkCollegeUseCase.execute(collegeLinkId, userId);
       return c.json({ data: { success: true } });
     });
+
+  // ─── Manual sync route ─────────────────────────────────────────────────
+  // Only wire up if enqueueSyncJob is provided (i.e., BullMQ is available)
+  if (enqueueSyncJob) {
+    const triggerManualSyncUseCase =
+      createTriggerManualSyncUseCase(enqueueSyncJob);
+
+    routes.post("/:id/sync", async (c) => {
+      const userId = c.get("userId");
+      const collegeLinkId = c.req.param("id");
+
+      await triggerManualSyncUseCase.execute(collegeLinkId, userId);
+      return c.json({ data: { success: true, message: "Sync job enqueued" } });
+    });
+  }
+
+  return routes;
 }
 
 /**

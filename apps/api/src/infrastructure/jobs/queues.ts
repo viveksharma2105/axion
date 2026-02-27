@@ -57,15 +57,37 @@ export interface CheckAttendanceAlertsJobData {
 
 /**
  * Enqueue a sync job for a single college link.
+ *
+ * Uses a deterministic `jobId` for deduplication — if a sync for this link
+ * is already waiting/active, BullMQ will skip the duplicate. However, if
+ * a previous job with the same ID exists in a completed/failed state (kept
+ * around by `removeOnComplete`/`removeOnFail`), we must remove it first
+ * before adding a new one.
  */
 export async function enqueueSyncJob(collegeLinkId: string): Promise<void> {
+  // BullMQ v5.70+ forbids ':' in custom jobId
+  const jobId = `sync-${collegeLinkId}`;
+
+  // Remove any stale completed/failed job with the same ID so re-enqueue works
+  const existing = await syncQueue.getJob(jobId);
+  if (existing) {
+    const state = await existing.getState();
+    if (state === "completed" || state === "failed") {
+      await existing.remove();
+    } else if (
+      state === "waiting" ||
+      state === "delayed" ||
+      state === "active"
+    ) {
+      // Job is already queued or running — skip to avoid duplicates
+      return;
+    }
+  }
+
   await syncQueue.add(
     "syncCollegeLink",
     { collegeLinkId } satisfies SyncCollegeLinkJobData,
-    {
-      jobId: `sync:${collegeLinkId}`,
-      // Deduplicate — if a sync job for this link is already queued, skip
-    },
+    { jobId },
   );
 }
 
