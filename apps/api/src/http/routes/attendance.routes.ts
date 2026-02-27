@@ -5,6 +5,7 @@ import {
 } from "@/http/container";
 import type { AuthVariables } from "@/http/middleware/auth";
 import { authMiddleware } from "@/http/middleware/auth";
+import { toISOString } from "@/http/utils";
 import { attendanceHistoryQuerySchema } from "@axion/shared";
 import { Hono } from "hono";
 
@@ -31,7 +32,7 @@ export const attendanceRoutes = new Hono<{ Variables: AuthVariables }>()
         totalLoa: r.totalLoa,
         totalOnDuty: r.totalOnDuty,
         percentage: r.percentage,
-        syncedAt: r.syncedAt.toISOString(),
+        syncedAt: toISOString(r.syncedAt),
       })),
     });
   })
@@ -55,7 +56,7 @@ export const attendanceRoutes = new Hono<{ Variables: AuthVariables }>()
         totalLoa: r.totalLoa,
         totalOnDuty: r.totalOnDuty,
         percentage: r.percentage,
-        syncedAt: r.syncedAt.toISOString(),
+        syncedAt: toISOString(r.syncedAt),
       })),
     });
   })

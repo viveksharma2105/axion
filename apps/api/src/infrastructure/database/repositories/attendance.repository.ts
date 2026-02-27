@@ -29,14 +29,19 @@ function toEntity(row: AttendanceRow): Attendance {
 
 export class AttendanceRepository implements IAttendanceRepository {
   async findLatestByCollegeLink(collegeLinkId: string): Promise<Attendance[]> {
-    // Get the most recent syncedAt timestamp
+    // Get the most recent syncedAt timestamp.
+    // sql<string> because the pg driver returns MAX(timestamp) as a string,
+    // not a Date object — we must wrap it in new Date() before using it
+    // in a Drizzle eq() comparison (which calls .toISOString()).
     const latestSync = await db
-      .select({ maxSynced: sql<Date>`MAX(${attendances.syncedAt})` })
+      .select({ maxSynced: sql<string>`MAX(${attendances.syncedAt})` })
       .from(attendances)
       .where(eq(attendances.collegeLinkId, collegeLinkId));
 
-    const maxSynced = latestSync[0]?.maxSynced;
-    if (!maxSynced) return [];
+    const maxSyncedRaw = latestSync[0]?.maxSynced;
+    if (!maxSyncedRaw) return [];
+
+    const maxSynced = new Date(maxSyncedRaw);
 
     const rows = await db.query.attendances.findMany({
       where: and(

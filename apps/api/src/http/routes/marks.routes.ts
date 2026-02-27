@@ -1,6 +1,7 @@
 import { getMarksSummaryUseCase, getMarksUseCase } from "@/http/container";
 import type { AuthVariables } from "@/http/middleware/auth";
 import { authMiddleware } from "@/http/middleware/auth";
+import { toISOString } from "@/http/utils";
 import { marksQuerySchema } from "@axion/shared";
 import { Hono } from "hono";
 
@@ -33,7 +34,7 @@ export const marksRoutes = new Hono<{ Variables: AuthVariables }>()
         sgpa: m.sgpa,
         cgpa: m.cgpa,
         semester: m.semester,
-        syncedAt: m.syncedAt.toISOString(),
+        syncedAt: toISOString(m.syncedAt),
       })),
     });
   })

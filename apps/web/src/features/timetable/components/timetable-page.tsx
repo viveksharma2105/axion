@@ -76,7 +76,11 @@ export function TimetablePage() {
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg">Today's Schedule</CardTitle>
                   <Badge variant="outline" className="text-xs">
-                    {DAYS[today]}
+                    {new Date().toLocaleDateString("en-US", {
+                      weekday: "long",
+                      month: "long",
+                      day: "numeric",
+                    })}
                   </Badge>
                 </div>
                 <CardDescription>

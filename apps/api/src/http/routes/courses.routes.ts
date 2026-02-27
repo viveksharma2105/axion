@@ -1,6 +1,7 @@
 import { getCoursesUseCase } from "@/http/container";
 import type { AuthVariables } from "@/http/middleware/auth";
 import { authMiddleware } from "@/http/middleware/auth";
+import { toISOString } from "@/http/utils";
 import { Hono } from "hono";
 
 /**
@@ -22,7 +23,7 @@ export const coursesRoutes = new Hono<{ Variables: AuthVariables }>()
         facultyName: course.facultyName,
         section: course.section,
         semester: course.semester,
-        syncedAt: course.syncedAt.toISOString(),
+        syncedAt: toISOString(course.syncedAt),
       })),
     });
   });
