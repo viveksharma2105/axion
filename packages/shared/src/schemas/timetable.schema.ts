@@ -5,6 +5,8 @@ import { z } from "zod";
 export const timetableEntrySchema = z.object({
   id: z.string().uuid(),
   dayOfWeek: z.number().int().min(0).max(6),
+  /** ISO date "YYYY-MM-DD" for the specific lecture date */
+  lectureDate: z.string().nullable(),
   startTime: z.string(),
   endTime: z.string(),
   courseCode: z.string().nullable(),

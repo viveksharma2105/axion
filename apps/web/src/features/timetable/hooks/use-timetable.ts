@@ -7,11 +7,15 @@ interface TimetableEntry {
   courseCode: string;
   courseTitle: string;
   dayOfWeek: number;
+  /** ISO date "YYYY-MM-DD" for the specific lecture date */
+  lectureDate: string | null;
   startTime: string;
   endTime: string;
   room: string;
   instructor: string;
 }
+
+export type { TimetableEntry };
 
 export function useTimetable() {
   return useQuery({

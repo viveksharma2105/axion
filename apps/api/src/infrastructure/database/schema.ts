@@ -123,6 +123,20 @@ export const userProfiles = pgTable("user_profiles", {
     push: true,
     inApp: true,
   }),
+  // ─── Student profile fields (populated from college adapter) ────────────
+  rollNo: varchar("roll_no", { length: 50 }),
+  studentName: varchar("student_name", { length: 255 }),
+  semester: smallint("semester"),
+  programmeName: varchar("programme_name", { length: 500 }),
+  degreeLevel: varchar("degree_level", { length: 20 }),
+  fatherName: varchar("father_name", { length: 255 }),
+  mobileNo: varchar("mobile_no", { length: 20 }),
+  section: varchar("section", { length: 50 }),
+  studentImage: text("student_image"),
+  /** Which college link populated these profile fields */
+  collegeLinkId: uuid("college_link_id").references(() => collegeLinks.id, {
+    onDelete: "set null",
+  }),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -215,6 +229,8 @@ export const timetables = pgTable(
       .notNull()
       .references(() => collegeLinks.id, { onDelete: "cascade" }),
     dayOfWeek: smallint("day_of_week").notNull(),
+    /** ISO date "YYYY-MM-DD" — the specific date this lecture is scheduled for */
+    lectureDate: varchar("lecture_date", { length: 10 }),
     startTime: time("start_time").notNull(),
     endTime: time("end_time").notNull(),
     courseCode: varchar("course_code", { length: 50 }),
@@ -230,6 +246,10 @@ export const timetables = pgTable(
   },
   (table) => [
     index("idx_timetables_link").on(table.collegeLinkId, table.dayOfWeek),
+    index("idx_timetables_link_date").on(
+      table.collegeLinkId,
+      table.lectureDate,
+    ),
   ],
 );
 

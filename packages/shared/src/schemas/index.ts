@@ -52,3 +52,10 @@ export {
   paginationSchema,
   type PaginationInput,
 } from "./common.schema";
+
+export {
+  studentProfileSchema,
+  studentProfileResponseSchema,
+  type StudentProfileResponse,
+  type StudentProfileApiResponse,
+} from "./profile.schema";

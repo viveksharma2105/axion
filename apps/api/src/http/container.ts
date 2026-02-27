@@ -16,6 +16,7 @@ import {
   NotificationRepository,
   SyncLogRepository,
   TimetableRepository,
+  UserProfileRepository,
 } from "@/infrastructure/database/repositories";
 import {
   decryptCredential,
@@ -50,6 +51,8 @@ import { GetCoursesUseCase } from "@/application/use-cases/courses/get-courses";
 import { SyncCollegeLinkUseCase } from "@/application/use-cases/sync/sync-college-link";
 import { TriggerManualSyncUseCase } from "@/application/use-cases/sync/trigger-manual-sync";
 
+import { GetStudentProfileUseCase } from "@/application/use-cases/profile/get-student-profile";
+
 import {
   GetNotificationsUseCase,
   MarkAllNotificationsReadUseCase,
@@ -66,6 +69,7 @@ export const marksRepo = new MarksRepository();
 export const coursesRepo = new CoursesRepository();
 export const notificationRepo = new NotificationRepository();
 export const syncLogRepo = new SyncLogRepository();
+export const userProfileRepo = new UserProfileRepository();
 
 // ─── Service adapters (implement ports using concrete infra) ─────────────────
 
@@ -152,6 +156,7 @@ export const syncCollegeLinkUseCase = new SyncCollegeLinkUseCase(
   timetableRepo,
   marksRepo,
   coursesRepo,
+  userProfileRepo,
   syncLogRepo,
   collegeAdapterService,
   encryptionService,
@@ -170,6 +175,11 @@ export const markNotificationReadUseCase = new MarkNotificationReadUseCase(
 
 export const markAllNotificationsReadUseCase =
   new MarkAllNotificationsReadUseCase(notificationRepo, cacheService);
+
+export const getStudentProfileUseCase = new GetStudentProfileUseCase(
+  userProfileRepo,
+  cacheService,
+);
 
 /**
  * Create the TriggerManualSyncUseCase.

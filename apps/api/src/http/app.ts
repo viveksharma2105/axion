@@ -8,6 +8,7 @@ import {
   createCollegeLinkRoutes,
   marksRoutes,
   notificationRoutes,
+  profileRoutes,
   timetableRoutes,
 } from "@/http/routes";
 import { auth } from "@/infrastructure/auth/auth";
@@ -61,6 +62,7 @@ export function createApp(
   app.route("/api/marks", marksRoutes);
   app.route("/api/courses", coursesRoutes);
   app.route("/api/notifications", notificationRoutes);
+  app.route("/api/profile", profileRoutes);
 
   return app;
 }

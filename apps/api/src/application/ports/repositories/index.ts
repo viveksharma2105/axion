@@ -28,3 +28,7 @@ export type {
   ISyncLogRepository,
   CreateSyncLogInput,
 } from "./sync-log.repository";
+export type {
+  IUserProfileRepository,
+  UpsertStudentProfileInput,
+} from "./user-profile.repository";

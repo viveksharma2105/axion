@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAttendance } from "@/features/attendance/hooks/use-attendance";
 import { useCourses } from "@/features/courses/hooks/use-courses";
 import { useMarksSummary } from "@/features/marks/hooks/use-marks";
+import { useStudentProfile } from "@/features/profile/hooks/use-student-profile";
 import { useTodaySchedule } from "@/features/timetable/hooks/use-timetable";
 import { api } from "@/lib/api-client";
 import { queryKeys } from "@/lib/query-keys";
@@ -55,14 +56,22 @@ function useCollegeLinks() {
 
 export function DashboardPage() {
   const { data: links, isLoading } = useCollegeLinks();
+  const { data: profile } = useStudentProfile();
   const hasLinks = links && links.length > 0;
+
+  const firstName = profile?.studentName
+    ? profile.studentName.trim().split(/\s+/)[0]
+    : null;
+  const greeting = firstName
+    ? `Welcome back, ${firstName.charAt(0)}${firstName.slice(1).toLowerCase()}.`
+    : "Welcome back.";
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground">
-          Welcome back. Here&apos;s an overview of your academics.
+          {greeting} Here&apos;s an overview of your academics.
         </p>
       </div>
 

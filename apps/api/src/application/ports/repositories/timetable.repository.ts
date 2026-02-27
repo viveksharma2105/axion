@@ -3,6 +3,8 @@ import type { TimetableEntry } from "@/domain/entities";
 export interface UpsertTimetableInput {
   collegeLinkId: string;
   dayOfWeek: number;
+  /** ISO date "YYYY-MM-DD" */
+  lectureDate: string | null;
   startTime: string;
   endTime: string;
   courseCode: string | null;
@@ -18,7 +20,10 @@ export interface ITimetableRepository {
   /** Get the full weekly timetable for a college link. */
   findByCollegeLink(collegeLinkId: string): Promise<TimetableEntry[]>;
 
-  /** Get today's schedule for a college link. */
+  /** Get schedule for a college link filtered by date ("YYYY-MM-DD"). */
+  findByDate(collegeLinkId: string, date: string): Promise<TimetableEntry[]>;
+
+  /** @deprecated Use findByDate for date-accurate queries. */
   findByDay(
     collegeLinkId: string,
     dayOfWeek: number,

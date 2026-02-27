@@ -37,8 +37,19 @@ export class GetTimetableUseCase {
   }
 }
 
+/** Format a Date as "YYYY-MM-DD" in local time. */
+function toLocalDateString(d: Date): string {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 /**
  * Get today's schedule for the user.
+ *
+ * Filters by the exact lecture date (YYYY-MM-DD) so that lectures
+ * scheduled for a future date with the same day-of-week are excluded.
  */
 export class GetTodayScheduleUseCase {
   constructor(
@@ -51,7 +62,7 @@ export class GetTodayScheduleUseCase {
     const link = links[0];
     if (!link) throw new CollegeLinkNotFoundError();
 
-    const today = new Date().getDay(); // 0=Sunday
-    return this.timetableRepo.findByDay(link.id, today);
+    const today = toLocalDateString(new Date());
+    return this.timetableRepo.findByDate(link.id, today);
   }
 }

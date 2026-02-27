@@ -14,6 +14,7 @@ function toEntity(row: TimetableRow): TimetableEntry {
     id: row.id,
     collegeLinkId: row.collegeLinkId,
     dayOfWeek: row.dayOfWeek,
+    lectureDate: row.lectureDate ?? null,
     startTime: row.startTime,
     endTime: row.endTime,
     courseCode: row.courseCode ?? null,
@@ -31,7 +32,25 @@ export class TimetableRepository implements ITimetableRepository {
   async findByCollegeLink(collegeLinkId: string): Promise<TimetableEntry[]> {
     const rows = await db.query.timetables.findMany({
       where: eq(timetables.collegeLinkId, collegeLinkId),
-      orderBy: (t, { asc }) => [asc(t.dayOfWeek), asc(t.startTime)],
+      orderBy: (t, { asc }) => [
+        asc(t.lectureDate),
+        asc(t.dayOfWeek),
+        asc(t.startTime),
+      ],
+    });
+    return rows.map(toEntity);
+  }
+
+  async findByDate(
+    collegeLinkId: string,
+    date: string,
+  ): Promise<TimetableEntry[]> {
+    const rows = await db.query.timetables.findMany({
+      where: and(
+        eq(timetables.collegeLinkId, collegeLinkId),
+        eq(timetables.lectureDate, date),
+      ),
+      orderBy: (t, { asc }) => [asc(t.startTime)],
     });
     return rows.map(toEntity);
   }
@@ -64,6 +83,7 @@ export class TimetableRepository implements ITimetableRepository {
           entries.map((e) => ({
             collegeLinkId: e.collegeLinkId,
             dayOfWeek: e.dayOfWeek,
+            lectureDate: e.lectureDate,
             startTime: e.startTime,
             endTime: e.endTime,
             courseCode: e.courseCode,

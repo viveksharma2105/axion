@@ -18,6 +18,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useStudentProfile } from "@/features/profile/hooks/use-student-profile";
 import { api } from "@/lib/api-client";
 import { signOut } from "@/lib/auth-client";
 import { queryKeys } from "@/lib/query-keys";
@@ -32,6 +33,7 @@ import {
   RefreshCw,
   Sun,
   Trash2,
+  User,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -59,6 +61,8 @@ export function SettingsPage() {
       </div>
 
       <CollegeLinkSection />
+      <Separator />
+      <StudentProfileSection />
       <Separator />
       <ThemeSection />
       <Separator />
@@ -311,6 +315,74 @@ function LinkCollegeForm({
         Link Account
       </Button>
     </form>
+  );
+}
+
+function StudentProfileSection() {
+  const { data: profile, isLoading } = useStudentProfile();
+
+  const fields = [
+    { label: "Name", value: profile?.studentName },
+    { label: "Roll Number", value: profile?.rollNo, mono: true },
+    { label: "Programme", value: profile?.programmeName },
+    { label: "Degree Level", value: profile?.degreeLevel },
+    { label: "Semester", value: profile?.semester?.toString() },
+    { label: "Section", value: profile?.section },
+    { label: "Father's Name", value: profile?.fatherName },
+    { label: "Mobile", value: profile?.mobileNo },
+  ];
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-lg">
+          <User className="h-5 w-5" />
+          Student Profile
+        </CardTitle>
+        <CardDescription>
+          Details synced from your college portal
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="space-y-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton list
+              <div key={i} className="flex justify-between">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-40" />
+              </div>
+            ))}
+          </div>
+        ) : !profile ? (
+          <p className="py-4 text-center text-sm text-muted-foreground">
+            No profile data yet. Link your college and sync to see your details
+            here.
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {fields.map(
+              (field) =>
+                field.value && (
+                  <div
+                    key={field.label}
+                    className="flex flex-col gap-1 sm:flex-row sm:justify-between"
+                  >
+                    <span className="text-sm text-muted-foreground">
+                      {field.label}
+                    </span>
+                    <span
+                      className={`text-sm font-medium ${field.mono ? "font-mono" : ""}`}
+                    >
+                      {field.value}
+                    </span>
+                  </div>
+                ),
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 

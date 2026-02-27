@@ -8,6 +8,7 @@ import type {
   IMarksRepository,
   ISyncLogRepository,
   ITimetableRepository,
+  IUserProfileRepository,
 } from "@/application/ports/repositories";
 import type {
   ICacheService,
@@ -39,6 +40,7 @@ export class SyncCollegeLinkUseCase {
     private readonly timetableRepo: ITimetableRepository,
     private readonly marksRepo: IMarksRepository,
     private readonly coursesRepo: ICoursesRepository,
+    private readonly userProfileRepo: IUserProfileRepository,
     private readonly syncLogRepo: ISyncLogRepository,
     private readonly adapterService: ICollegeAdapterService,
     private readonly encryptionService: IEncryptionService,
@@ -112,8 +114,13 @@ export class SyncCollegeLinkUseCase {
         fetchResult = await this.fetchAllData(adapter, auth);
       }
 
-      const { attendanceData, timetableData, marksData, coursesData } =
-        fetchResult;
+      const {
+        attendanceData,
+        timetableData,
+        marksData,
+        coursesData,
+        studentProfileData,
+      } = fetchResult;
 
       // 4. Upsert into Postgres
       if (attendanceData.length > 0) {
@@ -140,6 +147,7 @@ export class SyncCollegeLinkUseCase {
           timetableData.map((t) => ({
             collegeLinkId: link.id,
             dayOfWeek: t.dayOfWeek,
+            lectureDate: t.date || null,
             startTime: t.startTime,
             endTime: t.endTime,
             courseCode: t.courseCode,
@@ -188,6 +196,23 @@ export class SyncCollegeLinkUseCase {
             syncedAt,
           })),
         );
+      }
+
+      // 4b. Upsert student profile (if adapter supports it)
+      if (studentProfileData) {
+        await this.userProfileRepo.upsertStudentProfile({
+          userId: link.userId,
+          collegeLinkId: link.id,
+          rollNo: studentProfileData.rollNo,
+          studentName: studentProfileData.studentName,
+          semester: studentProfileData.semester,
+          programmeName: studentProfileData.programmeName,
+          degreeLevel: studentProfileData.degreeLevel,
+          fatherName: studentProfileData.fatherName,
+          mobileNo: studentProfileData.mobileNo,
+          section: studentProfileData.section,
+          studentImage: studentProfileData.studentImage,
+        });
       }
 
       // 5. Invalidate cache
@@ -285,13 +310,20 @@ export class SyncCollegeLinkUseCase {
    * so the caller can detect a potential auth issue and retry.
    */
   private async fetchAllData(adapter: CollegeAdapter, auth: CollegeAuthResult) {
-    const [attendanceData, timetableData, marksData, coursesData] =
-      await Promise.all([
-        adapter.getAttendance(auth).catch(() => []),
-        adapter.getTimetable(auth).catch(() => []),
-        adapter.getMarks(auth).catch(() => []),
-        adapter.getCourses(auth).catch(() => []),
-      ]);
+    const [
+      attendanceData,
+      timetableData,
+      marksData,
+      coursesData,
+      studentProfileData,
+    ] = await Promise.all([
+      adapter.getAttendance(auth).catch(() => []),
+      adapter.getTimetable(auth).catch(() => []),
+      adapter.getMarks(auth).catch(() => []),
+      adapter.getCourses(auth).catch(() => []),
+      adapter.getStudentProfile?.(auth).catch(() => null) ??
+        Promise.resolve(null),
+    ]);
 
     const allEmpty =
       attendanceData.length === 0 &&
@@ -299,6 +331,13 @@ export class SyncCollegeLinkUseCase {
       marksData.length === 0 &&
       coursesData.length === 0;
 
-    return { attendanceData, timetableData, marksData, coursesData, allEmpty };
+    return {
+      attendanceData,
+      timetableData,
+      marksData,
+      coursesData,
+      studentProfileData,
+      allEmpty,
+    };
   }
 }

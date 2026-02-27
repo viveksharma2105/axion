@@ -8,3 +8,4 @@ export { timetableRoutes } from "./timetable.routes";
 export { marksRoutes } from "./marks.routes";
 export { coursesRoutes } from "./courses.routes";
 export { notificationRoutes } from "./notification.routes";
+export { profileRoutes } from "./profile.routes";

@@ -18,6 +18,7 @@ export const timetableRoutes = new Hono<{ Variables: AuthVariables }>()
       data: entries.map((e) => ({
         id: e.id,
         dayOfWeek: e.dayOfWeek,
+        lectureDate: e.lectureDate,
         startTime: e.startTime,
         endTime: e.endTime,
         courseCode: e.courseCode,
@@ -35,6 +36,7 @@ export const timetableRoutes = new Hono<{ Variables: AuthVariables }>()
       data: entries.map((e) => ({
         id: e.id,
         dayOfWeek: e.dayOfWeek,
+        lectureDate: e.lectureDate,
         startTime: e.startTime,
         endTime: e.endTime,
         courseCode: e.courseCode,

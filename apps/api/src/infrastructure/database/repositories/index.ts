@@ -6,3 +6,4 @@ export { MarksRepository } from "./marks.repository";
 export { CoursesRepository } from "./courses.repository";
 export { NotificationRepository } from "./notification.repository";
 export { SyncLogRepository } from "./sync-log.repository";
+export { UserProfileRepository } from "./user-profile.repository";

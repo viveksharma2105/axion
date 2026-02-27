@@ -31,4 +31,7 @@ export const queryKeys = {
     list: (page?: number) =>
       [...queryKeys.notifications.all, "list", page] as const,
   },
+  profile: {
+    all: ["profile"] as const,
+  },
 } as const;
