@@ -3,9 +3,9 @@ import { errorHandler } from "@/http/middleware/error-handler";
 import { rateLimiter } from "@/http/middleware/rate-limit";
 import {
   attendanceRoutes,
-  collegeLinkRoutes,
   collegeRoutes,
   coursesRoutes,
+  createCollegeLinkRoutes,
   marksRoutes,
   notificationRoutes,
   timetableRoutes,
@@ -18,10 +18,13 @@ import { logger } from "hono/logger";
 /**
  * Create and configure the Hono application.
  *
- * Returns the app instance and a function to register the manual sync route
- * (called after BullMQ queues are initialized).
+ * Accepts an optional `enqueueSyncJob` callback so that the college-link
+ * POST handler can trigger an initial sync immediately after linking.
+ * This is injected from index.ts once BullMQ queues are initialized.
  */
-export function createApp() {
+export function createApp(
+  enqueueSyncJob?: (collegeLinkId: string) => Promise<void>,
+) {
   const app = new Hono<{ Variables: AuthVariables }>();
 
   // ─── Global middleware ────────────────────────────────────────────────────
@@ -52,7 +55,7 @@ export function createApp() {
 
   // ─── API routes ──────────────────────────────────────────────────────────
   app.route("/api/colleges", collegeRoutes);
-  app.route("/api/college-links", collegeLinkRoutes);
+  app.route("/api/college-links", createCollegeLinkRoutes(enqueueSyncJob));
   app.route("/api/attendance", attendanceRoutes);
   app.route("/api/timetable", timetableRoutes);
   app.route("/api/marks", marksRoutes);

@@ -42,7 +42,7 @@ interface CollegeLink {
   id: string;
   collegeSlug: string;
   syncStatus: string;
-  lastSyncedAt: string | null;
+  lastSyncAt: string | null;
 }
 
 function useCollegeLinks() {

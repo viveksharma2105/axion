@@ -1,5 +1,8 @@
 export { collegeRoutes } from "./college.routes";
-export { collegeLinkRoutes } from "./college-link.routes";
+export {
+  collegeLinkRoutes,
+  createCollegeLinkRoutes,
+} from "./college-link.routes";
 export { attendanceRoutes } from "./attendance.routes";
 export { timetableRoutes } from "./timetable.routes";
 export { marksRoutes } from "./marks.routes";

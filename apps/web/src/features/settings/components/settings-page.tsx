@@ -45,7 +45,7 @@ interface CollegeLink {
   id: string;
   collegeSlug: string;
   syncStatus: string;
-  lastSyncedAt: string | null;
+  lastSyncAt: string | null;
 }
 
 export function SettingsPage() {
@@ -214,8 +214,8 @@ function CollegeLinkSection() {
                     </p>
                     <p className="truncate text-xs text-muted-foreground">
                       Status: {link.syncStatus}
-                      {link.lastSyncedAt &&
-                        ` · Last synced: ${new Date(link.lastSyncedAt).toLocaleString()}`}
+                      {link.lastSyncAt &&
+                        ` · Last synced: ${new Date(link.lastSyncAt).toLocaleString()}`}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">

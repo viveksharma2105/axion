@@ -14,11 +14,10 @@ import { Hono } from "hono";
 // ─── Register college adapters at startup ────────────────────────────────────
 registerAdapters();
 
-// ─── Create app ──────────────────────────────────────────────────────────────
-const app = createApp();
+// ─── Create app (pass enqueueSyncJob so linking triggers initial sync) ───────
+const app = createApp(enqueueSyncJob);
 
 // ─── Wire up manual sync route (needs BullMQ enqueueSyncJob) ─────────────────
-// This route requires the BullMQ queue, so we add it after the app is created
 const triggerManualSyncUseCase = createTriggerManualSyncUseCase(enqueueSyncJob);
 
 const syncRoute = new Hono<{ Variables: AuthVariables }>()
