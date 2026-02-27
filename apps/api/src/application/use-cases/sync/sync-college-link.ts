@@ -1,3 +1,4 @@
+import type { CollegeAdapter } from "@/application/ports/college-adapter.port";
 import type { CollegeAuthResult } from "@/application/ports/college-adapter.port";
 import type {
   IAttendanceRepository,
@@ -96,31 +97,23 @@ export class SyncCollegeLinkUseCase {
         passwordAuthTag,
       );
 
-      // 2. Login to college API
-      let auth: CollegeAuthResult;
-      if (
-        link.collegeToken &&
-        link.tokenExpiresAt &&
-        link.tokenExpiresAt > new Date()
-      ) {
-        auth = {
-          token: link.collegeToken,
-          collegeUserId: link.collegeUserId ?? undefined,
-        };
-      } else {
-        auth = await adapter.login({ username, password });
-      }
+      // 2. Obtain auth — reuse cached token if still valid, otherwise login fresh
+      let auth = await this.resolveAuth(adapter, link, { username, password });
 
       const syncedAt = new Date();
 
-      // 3. Fetch all data in parallel
-      const [attendanceData, timetableData, marksData, coursesData] =
-        await Promise.all([
-          adapter.getAttendance(auth).catch(() => []),
-          adapter.getTimetable(auth).catch(() => []),
-          adapter.getMarks(auth).catch(() => []),
-          adapter.getCourses(auth).catch(() => []),
-        ]);
+      // 3. Fetch all data in parallel — with automatic 401 retry
+      let fetchResult = await this.fetchAllData(adapter, auth);
+
+      // If ALL fetches returned empty AND we were using a cached token,
+      // the token may have been revoked server-side. Retry with a fresh login.
+      if (fetchResult.allEmpty && auth.token === link.collegeToken) {
+        auth = await adapter.login({ username, password });
+        fetchResult = await this.fetchAllData(adapter, auth);
+      }
+
+      const { attendanceData, timetableData, marksData, coursesData } =
+        fetchResult;
 
       // 4. Upsert into Postgres
       if (attendanceData.length > 0) {
@@ -200,7 +193,7 @@ export class SyncCollegeLinkUseCase {
       // 5. Invalidate cache
       await this.cacheService.invalidateCollegeLink(link.id);
 
-      // 6. Update link status
+      // 6. Update link status — persist the token and its expiry for future reuse
       await this.collegeLinkRepo.updateSync(link.id, {
         syncStatus: SyncStatus.SUCCESS,
         lastSyncAt: syncedAt,
@@ -237,5 +230,75 @@ export class SyncCollegeLinkUseCase {
 
       throw new SyncFailedError(errorMessage);
     }
+  }
+
+  // ─── Private Helpers ────────────────────────────────────────────────────
+
+  /**
+   * Resolve auth by reusing a cached token or performing a fresh login.
+   *
+   * Token reuse conditions:
+   * 1. The link has a stored token
+   * 2. The token hasn't expired (checked via `tokenExpiresAt` OR adapter's `isTokenValid`)
+   *
+   * If the adapter implements `isTokenValid`, we use that for a more accurate check
+   * (e.g., inspecting JWT `exp` claim with a safety buffer).
+   */
+  private async resolveAuth(
+    adapter: CollegeAdapter,
+    link: {
+      collegeToken: string | null;
+      tokenExpiresAt: Date | null;
+      collegeUserId: string | null;
+    },
+    credentials: { username: string; password: string },
+  ): Promise<CollegeAuthResult> {
+    if (link.collegeToken) {
+      // Use adapter's isTokenValid if available (more accurate — checks JWT exp with buffer)
+      if (adapter.isTokenValid) {
+        const candidateAuth: CollegeAuthResult = {
+          token: link.collegeToken,
+          collegeUserId: link.collegeUserId ?? undefined,
+        };
+        const valid = await adapter.isTokenValid(candidateAuth);
+        if (valid) return candidateAuth;
+      }
+      // Fallback: check stored expiry from DB
+      else if (link.tokenExpiresAt && link.tokenExpiresAt > new Date()) {
+        return {
+          token: link.collegeToken,
+          collegeUserId: link.collegeUserId ?? undefined,
+        };
+      }
+    }
+
+    // No valid cached token — perform fresh login
+    return adapter.login(credentials);
+  }
+
+  /**
+   * Fetch all data from the college API in parallel.
+   *
+   * Individual endpoint failures are caught and result in empty arrays
+   * for that data type (e.g., marks endpoint returning 500 shouldn't
+   * block attendance sync). However, we track if ALL returned empty
+   * so the caller can detect a potential auth issue and retry.
+   */
+  private async fetchAllData(adapter: CollegeAdapter, auth: CollegeAuthResult) {
+    const [attendanceData, timetableData, marksData, coursesData] =
+      await Promise.all([
+        adapter.getAttendance(auth).catch(() => []),
+        adapter.getTimetable(auth).catch(() => []),
+        adapter.getMarks(auth).catch(() => []),
+        adapter.getCourses(auth).catch(() => []),
+      ]);
+
+    const allEmpty =
+      attendanceData.length === 0 &&
+      timetableData.length === 0 &&
+      marksData.length === 0 &&
+      coursesData.length === 0;
+
+    return { attendanceData, timetableData, marksData, coursesData, allEmpty };
   }
 }

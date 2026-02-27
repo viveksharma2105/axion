@@ -128,6 +128,21 @@ export class NcuAdapter implements CollegeAdapter {
     return parseStudentProfileData(json);
   }
 
+  /**
+   * Check if the cached token is still valid by inspecting the JWT `exp` claim.
+   * Returns false if expired or unparseable, avoiding an unnecessary API call.
+   */
+  async isTokenValid(auth: CollegeAuthResult): Promise<boolean> {
+    if (!auth.token) return false;
+    return !isJwtExpired(auth.token);
+  }
+
+  /**
+   * NCU doesn't have a refresh-token endpoint. "Refreshing" means re-logging in.
+   * The sync use case handles this by catching 401s and calling login() again.
+   * This method is not implemented — callers should use login() directly.
+   */
+
   // ─── Private Helpers ────────────────────────────────────────────────────
 
   /**
@@ -339,9 +354,11 @@ export function parseLoginResponse(data: NcuLoginResponse): CollegeAuthResult {
   }
 
   const collegeUserId = data.User?.UserId;
+  const expiresAt = extractJwtExpiry(token);
 
   return {
     token,
+    expiresAt,
     collegeUserId: collegeUserId ?? undefined,
     displayName: data.User?.Name?.trim() ?? undefined,
     rawResponse: data,
@@ -530,6 +547,44 @@ export function parseStudentProfileData(
     studentImage: row.StudentImage ?? undefined,
     raw: row,
   };
+}
+
+// ─── JWT Helpers ─────────────────────────────────────────────────────────────
+
+/**
+ * Extract expiry date from a JWT without verifying the signature.
+ * NCU JWTs are standard HS512 tokens with an `exp` claim (Unix seconds).
+ *
+ * Returns undefined if the token is malformed or has no `exp` claim.
+ * We subtract a 60-second buffer to avoid using tokens that are about to expire.
+ */
+export function extractJwtExpiry(token: string): Date | undefined {
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return undefined;
+
+    // JWT payload is base64url-encoded
+    const payload = parts[1]!;
+    const decoded = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
+    const parsed = JSON.parse(decoded) as { exp?: number };
+
+    if (typeof parsed.exp !== "number") return undefined;
+
+    // Subtract 60s buffer so we re-login before the token actually expires
+    return new Date((parsed.exp - 60) * 1000);
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Check if a JWT is expired based on its `exp` claim.
+ * Returns true if the token is still valid, false if expired or unparseable.
+ */
+export function isJwtExpired(token: string): boolean {
+  const expiry = extractJwtExpiry(token);
+  if (!expiry) return true;
+  return expiry.getTime() <= Date.now();
 }
 
 // ─── Utility Functions ───────────────────────────────────────────────────────

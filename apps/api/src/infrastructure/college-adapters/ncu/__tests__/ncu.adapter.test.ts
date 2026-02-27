@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   NcuApiError,
+  extractJwtExpiry,
   formatTimeHHmm,
+  isJwtExpired,
   parseAttendanceData,
   parseCourseDetails,
   parseCoursesData,
@@ -35,6 +37,10 @@ describe("parseLoginResponse", () => {
     );
     expect(result.displayName).toBe("23CSU343");
     expect(result.rawResponse).toEqual(loginResponse);
+    // Token expiry should be extracted from the JWT's exp claim
+    expect(result.expiresAt).toBeInstanceOf(Date);
+    // Fixture JWT has exp=1770003600 → Date minus 60s buffer
+    expect(result.expiresAt!.getTime()).toBe((1770003600 - 60) * 1000);
   });
 
   it("throws on failed login (Succeeded: false)", () => {
@@ -464,6 +470,54 @@ describe("formatTimeHHmm", () => {
 
   it("returns original string if no match", () => {
     expect(formatTimeHHmm("8:30 AM")).toBe("8:30 AM");
+  });
+});
+
+// ─── JWT Helpers ─────────────────────────────────────────────────────────────
+
+describe("extractJwtExpiry", () => {
+  it("extracts expiry from a valid JWT with exp claim", () => {
+    // Fixture token has exp=1770003600
+    const expiry = extractJwtExpiry(loginResponse.token);
+    expect(expiry).toBeInstanceOf(Date);
+    // 60-second buffer subtracted
+    expect(expiry!.getTime()).toBe((1770003600 - 60) * 1000);
+  });
+
+  it("returns undefined for a token without exp claim", () => {
+    // JWT with payload {"sub":"test"} (no exp)
+    const noExpToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.fake-sig";
+    expect(extractJwtExpiry(noExpToken)).toBeUndefined();
+  });
+
+  it("returns undefined for malformed token (not 3 parts)", () => {
+    expect(extractJwtExpiry("not-a-jwt")).toBeUndefined();
+    expect(extractJwtExpiry("only.two")).toBeUndefined();
+    expect(extractJwtExpiry("")).toBeUndefined();
+  });
+
+  it("returns undefined for token with invalid base64 payload", () => {
+    expect(extractJwtExpiry("a.!!!invalid!!!.c")).toBeUndefined();
+  });
+});
+
+describe("isJwtExpired", () => {
+  it("returns true for an expired token", () => {
+    // Fixture token exp=1770003600 which is in the past (2026-02-02)
+    expect(isJwtExpired(loginResponse.token)).toBe(true);
+  });
+
+  it("returns true for malformed tokens", () => {
+    expect(isJwtExpired("not-a-jwt")).toBe(true);
+    expect(isJwtExpired("")).toBe(true);
+  });
+
+  it("returns false for a token with far-future exp", () => {
+    // Create a JWT payload with exp far in the future (year 2099)
+    const futureExp = Math.floor(new Date("2099-01-01").getTime() / 1000);
+    const payload = btoa(JSON.stringify({ exp: futureExp }));
+    const futureToken = `eyJhbGciOiJIUzI1NiJ9.${payload}.fake-sig`;
+    expect(isJwtExpired(futureToken)).toBe(false);
   });
 });
 
