@@ -72,7 +72,9 @@ export function CoursesPage() {
             <CardDescription>
               Total credits:{" "}
               <span className="tabular-nums">
-                {courses.reduce((sum, c) => sum + c.credits, 0).toFixed(1)}
+                {courses
+                  .reduce((sum, c) => sum + (c.credits ?? 0), 0)
+                  .toFixed(1)}
               </span>
             </CardDescription>
           </CardHeader>
@@ -82,9 +84,8 @@ export function CoursesPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Code</TableHead>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Type</TableHead>
+                    <TableHead>Course</TableHead>
+                    <TableHead>Faculty</TableHead>
                     <TableHead className="text-right tabular-nums">
                       Credits
                     </TableHead>
@@ -93,19 +94,23 @@ export function CoursesPage() {
                 <TableBody>
                   {courses.map((course) => (
                     <TableRow key={course.courseCode}>
-                      <TableCell className="font-mono text-sm">
-                        {course.courseCode}
-                      </TableCell>
-                      <TableCell className="max-w-[250px] truncate">
-                        {course.courseTitle}
+                      <TableCell>
+                        <div>
+                          <p className="text-sm font-medium">
+                            {course.courseName}
+                          </p>
+                          <p className="font-mono text-xs text-muted-foreground">
+                            {course.courseCode}
+                          </p>
+                        </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="secondary" className="text-xs">
-                          {course.courseType}
-                        </Badge>
+                        <span className="text-sm text-muted-foreground">
+                          {course.facultyName ?? "—"}
+                        </span>
                       </TableCell>
                       <TableCell className="text-right tabular-nums">
-                        {course.credits.toFixed(1)}
+                        {(course.credits ?? 0).toFixed(1)}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -119,22 +124,20 @@ export function CoursesPage() {
                 <div key={course.courseCode} className="rounded-lg border p-3">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
-                      <span className="font-mono text-sm">
+                      <p className="text-sm font-medium">{course.courseName}</p>
+                      <span className="font-mono text-xs text-muted-foreground">
                         {course.courseCode}
                       </span>
-                      <p className="truncate text-sm text-muted-foreground">
-                        {course.courseTitle}
-                      </p>
                     </div>
                     <span className="shrink-0 text-sm font-medium tabular-nums">
-                      {course.credits.toFixed(1)} cr
+                      {(course.credits ?? 0).toFixed(1)} cr
                     </span>
                   </div>
-                  <div className="mt-2">
-                    <Badge variant="secondary" className="text-xs">
-                      {course.courseType}
-                    </Badge>
-                  </div>
+                  {course.facultyName && (
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {course.facultyName}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>

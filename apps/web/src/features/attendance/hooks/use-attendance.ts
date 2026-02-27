@@ -3,24 +3,30 @@ import { queryKeys } from "@/lib/query-keys";
 import { useQuery } from "@tanstack/react-query";
 
 interface AttendanceRecord {
+  id: string;
   courseCode: string;
-  courseTitle: string;
-  present: number;
-  total: number;
-  percentage: number;
-  threshold: number;
-  lastUpdated: string;
+  courseName: string | null;
+  totalLectures: number;
+  totalPresent: number;
+  totalAbsent: number;
+  totalLoa: number;
+  totalOnDuty: number;
+  percentage: number | null;
+  syncedAt: string;
 }
 
 interface AttendanceProjection {
   courseCode: string;
-  courseTitle: string;
+  courseName: string | null;
   currentPercentage: number;
-  threshold: number;
-  canSkip: number;
-  mustAttend: number;
-  status: "safe" | "warning" | "danger";
+  totalLectures: number;
+  totalPresent: number;
+  classesNeededForThreshold: number;
+  canReachThreshold: boolean;
+  classesCanSkip: number;
 }
+
+export type { AttendanceRecord, AttendanceProjection };
 
 export function useAttendance() {
   return useQuery({

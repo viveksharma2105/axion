@@ -155,12 +155,12 @@ export function TimetablePage() {
 interface ScheduleItemProps {
   entry: {
     id: string;
-    courseCode: string;
-    courseTitle: string;
+    courseCode: string | null;
+    courseName: string | null;
     startTime: string;
     endTime: string;
-    room: string;
-    instructor: string;
+    room: string | null;
+    facultyName: string | null;
   };
 }
 
@@ -175,13 +175,23 @@ function ScheduleItem({ entry }: ScheduleItemProps) {
       </div>
       <div className="h-10 w-px bg-border" />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium">{entry.courseTitle}</p>
+        <p className="truncate text-sm font-medium">
+          {entry.courseName ?? "Unknown Course"}
+        </p>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <span className="font-mono">{entry.courseCode}</span>
+          {entry.courseCode && (
+            <span className="font-mono">{entry.courseCode}</span>
+          )}
           {entry.room && (
             <>
               <span>&middot;</span>
               <span>{entry.room}</span>
+            </>
+          )}
+          {entry.facultyName && (
+            <>
+              <span>&middot;</span>
+              <span>{entry.facultyName}</span>
             </>
           )}
         </div>

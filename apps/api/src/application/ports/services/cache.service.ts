@@ -13,5 +13,6 @@ export interface ICacheService {
   ): Promise<void>;
   del(namespace: string, id: string): Promise<void>;
   invalidateCollegeLink(collegeLinkId: string): Promise<void>;
+  invalidateStudentProfile(userId: string): Promise<void>;
   invalidateNotificationCount(userId: string): Promise<void>;
 }

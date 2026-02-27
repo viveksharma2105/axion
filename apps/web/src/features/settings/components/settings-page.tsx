@@ -35,7 +35,7 @@ import {
   Trash2,
   User,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface College {
   id: string;
@@ -81,7 +81,29 @@ function CollegeLinkSection() {
     queryKey: queryKeys.collegeLinks.all,
     queryFn: () => api.get<CollegeLink[]>("/college-links"),
     select: (data) => data.data,
+    refetchInterval: (query) => {
+      const data = query.state.data?.data;
+      const hasPending = data?.some(
+        (l: CollegeLink) =>
+          l.syncStatus === "pending" || l.syncStatus === "syncing",
+      );
+      return hasPending ? 3000 : false;
+    },
   });
+
+  // Detect when sync completes (pending/syncing → success) and invalidate profile
+  const hasPendingSync = links?.some(
+    (l) => l.syncStatus === "pending" || l.syncStatus === "syncing",
+  );
+  const wasPending = useRef(false);
+  useEffect(() => {
+    if (hasPendingSync) {
+      wasPending.current = true;
+    } else if (wasPending.current && links) {
+      wasPending.current = false;
+      queryClient.invalidateQueries({ queryKey: queryKeys.profile.all });
+    }
+  }, [hasPendingSync, links, queryClient]);
 
   const { data: colleges } = useQuery({
     queryKey: queryKeys.colleges.all,
@@ -114,6 +136,7 @@ function CollegeLinkSection() {
     mutationFn: (id: string) => api.post(`/college-links/${id}/sync`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.collegeLinks.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.profile.all });
     },
   });
 

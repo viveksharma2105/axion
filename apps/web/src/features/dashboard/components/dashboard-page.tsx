@@ -8,18 +8,23 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAttendance } from "@/features/attendance/hooks/use-attendance";
+import {
+  type AttendanceRecord,
+  useAttendance,
+} from "@/features/attendance/hooks/use-attendance";
 import { useCourses } from "@/features/courses/hooks/use-courses";
 import { useMarksSummary } from "@/features/marks/hooks/use-marks";
 import { useStudentProfile } from "@/features/profile/hooks/use-student-profile";
-import { useTodaySchedule } from "@/features/timetable/hooks/use-timetable";
+import {
+  type TimetableEntry,
+  useTodaySchedule,
+} from "@/features/timetable/hooks/use-timetable";
 import { api } from "@/lib/api-client";
 import { queryKeys } from "@/lib/query-keys";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import {
-  BarChart3,
   BookOpen,
   Calendar,
   Clock,
@@ -38,6 +43,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+
+const DEFAULT_THRESHOLD = 75;
 
 interface CollegeLink {
   id: string;
@@ -107,27 +114,25 @@ function DashboardContent() {
   const { data: attendance, isLoading: attendanceLoading } = useAttendance();
   const { data: todaySchedule, isLoading: scheduleLoading } =
     useTodaySchedule();
-  const { data: summary, isLoading: summaryLoading } = useMarksSummary();
+  const { data: summary } = useMarksSummary();
   const { data: courses, isLoading: coursesLoading } = useCourses();
 
   const overallAttendance =
     attendance && attendance.length > 0
-      ? attendance.reduce((sum, r) => sum + r.percentage, 0) / attendance.length
+      ? attendance.reduce((sum, r) => sum + (r.percentage ?? 0), 0) /
+        attendance.length
       : null;
 
   const belowThreshold = attendance
-    ? attendance.filter((r) => r.percentage < r.threshold).length
+    ? attendance.filter((r) => (r.percentage ?? 0) < DEFAULT_THRESHOLD).length
     : 0;
-
-  const latestGpa =
-    summary && summary.length > 0 ? summary[summary.length - 1] : null;
 
   const totalClasses = todaySchedule?.length ?? null;
 
   return (
     <div className="space-y-6">
       {/* Quick stats grid */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard
           title="Attendance"
           icon={GraduationCap}
@@ -140,11 +145,13 @@ function DashboardContent() {
               <p
                 className={cn(
                   "text-3xl font-bold tabular-nums",
-                  overallAttendance >= 75 && "text-attendance-safe",
-                  overallAttendance < 75 &&
-                    overallAttendance >= 70 &&
+                  overallAttendance >= DEFAULT_THRESHOLD &&
+                    "text-attendance-safe",
+                  overallAttendance < DEFAULT_THRESHOLD &&
+                    overallAttendance >= DEFAULT_THRESHOLD - 5 &&
                     "text-attendance-warning",
-                  overallAttendance < 70 && "text-attendance-danger",
+                  overallAttendance < DEFAULT_THRESHOLD - 5 &&
+                    "text-attendance-danger",
                 )}
               >
                 {overallAttendance.toFixed(1)}%
@@ -183,28 +190,6 @@ function DashboardContent() {
         </StatCard>
 
         <StatCard
-          title="Current CGPA"
-          icon={BarChart3}
-          linkTo="/marks"
-          linkLabel="View marks"
-          isLoading={summaryLoading}
-        >
-          {latestGpa ? (
-            <>
-              <p className="text-3xl font-bold tabular-nums">
-                {latestGpa.cgpa.toFixed(2)}
-              </p>
-              <p className="text-xs text-muted-foreground tabular-nums">
-                SGPA: {latestGpa.sgpa.toFixed(2)} &middot; Sem{" "}
-                {latestGpa.semester}
-              </p>
-            </>
-          ) : (
-            <p className="text-sm text-muted-foreground">No data</p>
-          )}
-        </StatCard>
-
-        <StatCard
           title="Courses"
           icon={BookOpen}
           linkTo="/courses"
@@ -217,7 +202,8 @@ function DashboardContent() {
                 {courses.length}
               </p>
               <p className="text-xs text-muted-foreground tabular-nums">
-                {courses.reduce((sum, c) => sum + c.credits, 0)} total credits
+                {courses.reduce((sum, c) => sum + (c.credits ?? 0), 0)} total
+                credits
               </p>
             </>
           ) : (
@@ -288,19 +274,8 @@ function StatCard({
   );
 }
 
-interface TodayScheduleEntry {
-  id: string;
-  courseCode: string;
-  courseTitle: string;
-  dayOfWeek: number;
-  startTime: string;
-  endTime: string;
-  room: string;
-  instructor: string;
-}
-
 interface TodayScheduleCardProps {
-  schedule: TodayScheduleEntry[] | null;
+  schedule: TimetableEntry[] | null;
   isLoading: boolean;
 }
 
@@ -353,12 +328,14 @@ function TodayScheduleCard({ schedule, isLoading }: TodayScheduleCardProps) {
                 <div className="h-8 w-px bg-border" />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium">
-                    {entry.courseTitle}
+                    {entry.courseName ?? "Unknown Course"}
                   </p>
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="font-mono text-xs">
-                      {entry.courseCode}
-                    </Badge>
+                    {entry.courseCode && (
+                      <Badge variant="outline" className="font-mono text-xs">
+                        {entry.courseCode}
+                      </Badge>
+                    )}
                     {entry.room && (
                       <span className="text-xs text-muted-foreground">
                         {entry.room}
@@ -380,25 +357,15 @@ function TodayScheduleCard({ schedule, isLoading }: TodayScheduleCardProps) {
   );
 }
 
-interface AttendanceRecord {
-  courseCode: string;
-  courseTitle: string;
-  present: number;
-  total: number;
-  percentage: number;
-  threshold: number;
-  lastUpdated: string;
-}
-
 interface AttendanceChartCardProps {
   attendance: AttendanceRecord[] | null;
   isLoading: boolean;
 }
 
-function getBarColor(percentage: number, threshold: number) {
-  if (percentage >= threshold) return "hsl(var(--chart-1))";
-  if (percentage >= threshold - 5) return "hsl(var(--chart-3))";
-  return "hsl(var(--chart-2))";
+function getBarColor(percentage: number) {
+  if (percentage >= DEFAULT_THRESHOLD) return "var(--chart-1)";
+  if (percentage >= DEFAULT_THRESHOLD - 5) return "var(--chart-3)";
+  return "var(--chart-2)";
 }
 
 function AttendanceChartCard({
@@ -408,8 +375,8 @@ function AttendanceChartCard({
   const chartData =
     attendance?.map((r) => ({
       name: r.courseCode,
-      percentage: Math.round(r.percentage * 10) / 10,
-      threshold: r.threshold,
+      courseName: r.courseName,
+      percentage: Math.round((r.percentage ?? 0) * 10) / 10,
     })) ?? [];
 
   return (
@@ -432,50 +399,77 @@ function AttendanceChartCard({
             </p>
           </div>
         ) : (
-          <div className="h-[200px] sm:h-[300px]">
+          <div className="h-[220px] sm:h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={chartData}
-                margin={{ top: 5, right: 10, left: -10, bottom: 5 }}
+                margin={{ top: 5, right: 10, left: -10, bottom: 30 }}
               >
                 <CartesianGrid
                   strokeDasharray="3 3"
-                  className="stroke-border"
+                  stroke="var(--border)"
+                  vertical={false}
                 />
                 <XAxis
                   dataKey="name"
-                  tick={{ fontSize: 10 }}
-                  className="fill-muted-foreground font-mono"
+                  tick={{
+                    fontSize: 10,
+                    fill: "var(--muted-foreground)",
+                    fontFamily: "var(--font-mono, monospace)",
+                  }}
                   interval={0}
                   angle={-45}
                   textAnchor="end"
-                  height={50}
+                  height={60}
+                  tickLine={false}
+                  axisLine={false}
                 />
                 <YAxis
                   domain={[0, 100]}
-                  tick={{ fontSize: 11 }}
-                  className="fill-muted-foreground"
+                  tick={{
+                    fontSize: 11,
+                    fill: "var(--muted-foreground)",
+                  }}
+                  tickLine={false}
+                  axisLine={false}
+                  width={40}
+                  tickFormatter={(value) => `${value}%`}
                 />
                 <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "var(--radius)",
-                    color: "hsl(var(--card-foreground))",
-                    fontVariantNumeric: "tabular-nums",
+                  cursor={{
+                    fill: "color-mix(in oklch, var(--muted) 30%, transparent)",
                   }}
-                  formatter={(value) => [`${value}%`, "Attendance"]}
+                  content={({ active, payload }) => {
+                    if (!active || !payload?.length) return null;
+                    const data = payload[0].payload;
+                    return (
+                      <div
+                        className="rounded-lg border bg-card px-3 py-2 shadow-md"
+                        style={{ fontVariantNumeric: "tabular-nums" }}
+                      >
+                        <p className="text-sm font-medium text-card-foreground">
+                          {data.courseName}
+                        </p>
+                        <p className="font-mono text-xs text-muted-foreground">
+                          {data.name}
+                        </p>
+                        <p className="mt-1 text-sm font-semibold text-card-foreground">
+                          {data.percentage}%
+                        </p>
+                      </div>
+                    );
+                  }}
                 />
-                <Legend />
                 <Bar
                   dataKey="percentage"
                   name="Attendance %"
                   radius={[4, 4, 0, 0]}
+                  isAnimationActive={false}
                 >
                   {chartData.map((entry) => (
                     <Cell
                       key={entry.name}
-                      fill={getBarColor(entry.percentage, entry.threshold)}
+                      fill={getBarColor(entry.percentage)}
                     />
                   ))}
                 </Bar>
@@ -519,24 +513,33 @@ function GpaTrendCard({ summary }: { summary: GpaSummary[] }) {
               data={chartData}
               margin={{ top: 5, right: 10, left: -10, bottom: 5 }}
             >
-              <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="var(--border)"
+                vertical={false}
+              />
               <XAxis
                 dataKey="name"
-                tick={{ fontSize: 11 }}
-                className="fill-muted-foreground"
+                tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+                tickLine={false}
+                axisLine={false}
               />
               <YAxis
                 domain={[0, 10]}
-                tick={{ fontSize: 11 }}
-                className="fill-muted-foreground"
+                tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+                tickLine={false}
+                axisLine={false}
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "hsl(var(--card))",
-                  border: "1px solid hsl(var(--border))",
+                  backgroundColor: "var(--card)",
+                  border: "1px solid var(--border)",
                   borderRadius: "var(--radius)",
-                  color: "hsl(var(--card-foreground))",
+                  color: "var(--card-foreground)",
                   fontVariantNumeric: "tabular-nums",
+                }}
+                cursor={{
+                  fill: "color-mix(in oklch, var(--muted) 30%, transparent)",
                 }}
                 formatter={(value) => [Number(value).toFixed(2)]}
               />
@@ -544,14 +547,16 @@ function GpaTrendCard({ summary }: { summary: GpaSummary[] }) {
               <Bar
                 dataKey="sgpa"
                 name="SGPA"
-                fill="hsl(var(--chart-1))"
+                fill="var(--chart-1)"
                 radius={[4, 4, 0, 0]}
+                isAnimationActive={false}
               />
               <Bar
                 dataKey="cgpa"
                 name="CGPA"
-                fill="hsl(var(--chart-4))"
+                fill="var(--chart-4)"
                 radius={[4, 4, 0, 0]}
+                isAnimationActive={false}
               />
             </BarChart>
           </ResponsiveContainer>
@@ -564,8 +569,8 @@ function GpaTrendCard({ summary }: { summary: GpaSummary[] }) {
 function DashboardSkeleton() {
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, i) => (
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: 3 }).map((_, i) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton list
           <Card key={i}>
             <CardHeader className="pb-2">

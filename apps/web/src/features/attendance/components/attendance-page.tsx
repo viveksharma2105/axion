@@ -7,6 +7,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -21,18 +31,20 @@ import {
   useAttendanceProjection,
 } from "@/features/attendance/hooks/use-attendance";
 import { cn } from "@/lib/utils";
-import { AlertCircle, GraduationCap } from "lucide-react";
+import { AlertCircle, Calculator, GraduationCap } from "lucide-react";
+import { useState } from "react";
 import {
   Bar,
   BarChart,
   CartesianGrid,
   Cell,
-  Legend,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
+
+const DEFAULT_THRESHOLD = 75;
 
 export function AttendancePage() {
   const { data: attendance, isLoading, error, refetch } = useAttendance();
@@ -62,12 +74,13 @@ export function AttendancePage() {
               value={
                 attendance.length > 0
                   ? (
-                      attendance.reduce((sum, r) => sum + r.percentage, 0) /
-                      attendance.length
+                      attendance.reduce(
+                        (sum, r) => sum + (r.percentage ?? 0),
+                        0,
+                      ) / attendance.length
                     ).toFixed(1)
                   : "0.0"
               }
-              attendance={attendance}
             />
             <Card>
               <CardHeader className="pb-2">
@@ -87,7 +100,11 @@ export function AttendancePage() {
               </CardHeader>
               <CardContent>
                 <p className="text-4xl font-bold tabular-nums text-attendance-danger">
-                  {attendance.filter((r) => r.percentage < r.threshold).length}
+                  {
+                    attendance.filter(
+                      (r) => (r.percentage ?? 0) < DEFAULT_THRESHOLD,
+                    ).length
+                  }
                 </p>
               </CardContent>
             </Card>
@@ -101,63 +118,91 @@ export function AttendancePage() {
                 Attendance percentage by subject
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="h-[200px] sm:h-[300px]">
+            <CardContent className="-mx-2 sm:mx-0">
+              <div className="h-[240px] sm:h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={attendance.map((r) => ({
                       name: r.courseCode,
-                      percentage: Math.round(r.percentage * 10) / 10,
-                      threshold: r.threshold,
+                      courseName: r.courseName,
+                      percentage: Math.round((r.percentage ?? 0) * 10) / 10,
                     }))}
-                    margin={{ top: 5, right: 10, left: -10, bottom: 5 }}
+                    margin={{ top: 5, right: 10, left: -15, bottom: 40 }}
                   >
                     <CartesianGrid
                       strokeDasharray="3 3"
-                      className="stroke-border"
+                      stroke="var(--border)"
+                      vertical={false}
                     />
                     <XAxis
                       dataKey="name"
-                      tick={{ fontSize: 10 }}
-                      className="fill-muted-foreground font-mono"
+                      tick={{
+                        fontSize: 9,
+                        fill: "var(--muted-foreground)",
+                        fontFamily: "var(--font-mono, monospace)",
+                      }}
                       interval={0}
                       angle={-45}
                       textAnchor="end"
-                      height={50}
+                      height={60}
+                      tickLine={false}
+                      axisLine={false}
                     />
                     <YAxis
                       domain={[0, 100]}
-                      tick={{ fontSize: 11 }}
-                      className="fill-muted-foreground"
+                      tick={{
+                        fontSize: 10,
+                        fill: "var(--muted-foreground)",
+                      }}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(value) => `${value}%`}
+                      width={40}
                     />
                     <Tooltip
-                      contentStyle={{
-                        backgroundColor: "hsl(var(--card))",
-                        border: "1px solid hsl(var(--border))",
-                        borderRadius: "var(--radius)",
-                        color: "hsl(var(--card-foreground))",
-                        fontVariantNumeric: "tabular-nums",
+                      cursor={{ fill: "var(--muted)", opacity: 0.3 }}
+                      content={({ active, payload }) => {
+                        if (!active || !payload?.length) return null;
+                        const data = payload[0].payload;
+                        return (
+                          <div
+                            className="rounded-lg border bg-card px-3 py-2 shadow-md"
+                            style={{ fontVariantNumeric: "tabular-nums" }}
+                          >
+                            <p className="text-sm font-medium text-card-foreground">
+                              {data.courseName}
+                            </p>
+                            <p className="font-mono text-xs text-muted-foreground">
+                              {data.name}
+                            </p>
+                            <p className="mt-1 text-sm font-semibold text-card-foreground">
+                              {data.percentage}%
+                            </p>
+                          </div>
+                        );
                       }}
-                      formatter={(value) => [`${value}%`, "Attendance"]}
                     />
-                    <Legend />
                     <Bar
                       dataKey="percentage"
                       name="Attendance %"
                       radius={[4, 4, 0, 0]}
+                      isAnimationActive={false}
                     >
-                      {attendance.map((r) => (
-                        <Cell
-                          key={r.courseCode}
-                          fill={
-                            r.percentage >= r.threshold
-                              ? "hsl(var(--chart-1))"
-                              : r.percentage >= r.threshold - 5
-                                ? "hsl(var(--chart-3))"
-                                : "hsl(var(--chart-2))"
-                          }
-                        />
-                      ))}
+                      {attendance.map((r) => {
+                        const pct = r.percentage ?? 0;
+                        return (
+                          <Cell
+                            key={r.courseCode}
+                            fill={
+                              pct >= DEFAULT_THRESHOLD
+                                ? "var(--chart-1)"
+                                : pct >= DEFAULT_THRESHOLD - 5
+                                  ? "var(--chart-3)"
+                                  : "var(--chart-2)"
+                            }
+                          />
+                        );
+                      })}
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>
@@ -168,10 +213,17 @@ export function AttendancePage() {
           {/* Attendance table — desktop */}
           <Card className="hidden sm:block">
             <CardHeader>
-              <CardTitle className="text-lg">Subject-wise Breakdown</CardTitle>
-              <CardDescription>
-                Attendance details for each course
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-lg">
+                    Subject-wise Breakdown
+                  </CardTitle>
+                  <CardDescription>
+                    Attendance details for each course
+                  </CardDescription>
+                </div>
+                <BunkCalculatorDialog attendance={attendance} />
+              </div>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto rounded-md border">
@@ -181,6 +233,9 @@ export function AttendancePage() {
                       <TableHead>Course</TableHead>
                       <TableHead className="text-right tabular-nums">
                         Present
+                      </TableHead>
+                      <TableHead className="text-right tabular-nums">
+                        Absent
                       </TableHead>
                       <TableHead className="text-right tabular-nums">
                         Total
@@ -206,30 +261,33 @@ export function AttendancePage() {
                                 {record.courseCode}
                               </span>
                               <p className="max-w-[200px] truncate text-xs text-muted-foreground">
-                                {record.courseTitle}
+                                {record.courseName}
                               </p>
                             </div>
                           </TableCell>
                           <TableCell className="text-right tabular-nums">
-                            {record.present}
+                            {record.totalPresent}
                           </TableCell>
                           <TableCell className="text-right tabular-nums">
-                            {record.total}
+                            {record.totalAbsent}
+                          </TableCell>
+                          <TableCell className="text-right tabular-nums">
+                            {record.totalLectures}
                           </TableCell>
                           <TableCell className="text-right">
                             <AttendanceBadge
-                              value={record.percentage}
-                              threshold={record.threshold}
+                              value={record.percentage ?? 0}
+                              threshold={DEFAULT_THRESHOLD}
                             />
                           </TableCell>
                           {projections && (
                             <TableCell className="text-right">
                               {projection && (
                                 <span className="text-xs text-muted-foreground">
-                                  {projection.canSkip > 0
-                                    ? `Can skip ${projection.canSkip}`
-                                    : projection.mustAttend > 0
-                                      ? `Need ${projection.mustAttend} more`
+                                  {projection.classesCanSkip > 0
+                                    ? `Can skip ${projection.classesCanSkip}`
+                                    : projection.classesNeededForThreshold > 0
+                                      ? `Need ${projection.classesNeededForThreshold} more`
                                       : "On track"}
                                 </span>
                               )}
@@ -246,9 +304,12 @@ export function AttendancePage() {
 
           {/* Attendance cards — mobile */}
           <div className="space-y-3 sm:hidden">
-            <h2 className="text-lg font-semibold tracking-tight">
-              Subject-wise Breakdown
-            </h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold tracking-tight">
+                Subject-wise Breakdown
+              </h2>
+              <BunkCalculatorDialog attendance={attendance} />
+            </div>
             {attendance.map((record) => {
               const projection = projections?.find(
                 (p) => p.courseCode === record.courseCode,
@@ -262,34 +323,40 @@ export function AttendancePage() {
                           {record.courseCode}
                         </span>
                         <p className="truncate text-xs text-muted-foreground">
-                          {record.courseTitle}
+                          {record.courseName}
                         </p>
                       </div>
                       <AttendanceBadge
-                        value={record.percentage}
-                        threshold={record.threshold}
+                        value={record.percentage ?? 0}
+                        threshold={DEFAULT_THRESHOLD}
                       />
                     </div>
-                    <div className="mt-3 flex items-center gap-4 text-sm text-muted-foreground tabular-nums">
+                    <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground tabular-nums">
                       <span>
                         Present:{" "}
                         <span className="font-medium text-foreground">
-                          {record.present}
+                          {record.totalPresent}
+                        </span>
+                      </span>
+                      <span>
+                        Absent:{" "}
+                        <span className="font-medium text-foreground">
+                          {record.totalAbsent}
                         </span>
                       </span>
                       <span>
                         Total:{" "}
                         <span className="font-medium text-foreground">
-                          {record.total}
+                          {record.totalLectures}
                         </span>
                       </span>
                     </div>
                     {projection && (
                       <p className="mt-2 text-xs text-muted-foreground">
-                        {projection.canSkip > 0
-                          ? `Can skip ${projection.canSkip} classes`
-                          : projection.mustAttend > 0
-                            ? `Need ${projection.mustAttend} more classes`
+                        {projection.classesCanSkip > 0
+                          ? `Can skip ${projection.classesCanSkip} classes`
+                          : projection.classesNeededForThreshold > 0
+                            ? `Need ${projection.classesNeededForThreshold} more classes`
                             : "On track"}
                       </p>
                     )}
@@ -303,6 +370,194 @@ export function AttendancePage() {
     </div>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/*  Bunk Calculator                                                    */
+/* ------------------------------------------------------------------ */
+
+interface AttendanceEntry {
+  courseCode: string;
+  courseName: string | null;
+  totalLectures: number;
+  totalPresent: number;
+  percentage: number | null;
+}
+
+interface BunkCalculatorDialogProps {
+  attendance: AttendanceEntry[];
+}
+
+function BunkCalculatorDialog({ attendance }: BunkCalculatorDialogProps) {
+  const [selectedCourse, setSelectedCourse] = useState<string>("");
+  const [bunkCount, setBunkCount] = useState<string>("");
+
+  const course = attendance.find((r) => r.courseCode === selectedCourse);
+
+  const bunkNum = Number(bunkCount || 0);
+  const totalAfter = course ? course.totalLectures + bunkNum : 0;
+  const presentAfter = course ? course.totalPresent : 0;
+  const percentageAfter =
+    totalAfter > 0 ? (presentAfter / totalAfter) * 100 : 0;
+
+  const hasResult = course && bunkNum > 0;
+
+  function handleOpenChange(open: boolean) {
+    if (!open) {
+      setSelectedCourse("");
+      setBunkCount("");
+    }
+  }
+
+  return (
+    <Dialog onOpenChange={handleOpenChange}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm" className="gap-2">
+          <Calculator className="h-4 w-4" />
+          <span className="hidden sm:inline">Bunk Calculator</span>
+          <span className="sm:hidden">Calculate</span>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Bunk Calculator</DialogTitle>
+          <DialogDescription>
+            See how your attendance changes if you skip classes
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 pt-1">
+          {/* Course selector */}
+          <div className="space-y-2">
+            <Label htmlFor="bunk-course">Course</Label>
+            <select
+              id="bunk-course"
+              value={selectedCourse}
+              onChange={(e) => {
+                setSelectedCourse(e.target.value);
+                setBunkCount("");
+              }}
+              className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            >
+              <option value="" className="bg-popover text-popover-foreground">
+                Select a course
+              </option>
+              {attendance.map((r) => (
+                <option
+                  key={r.courseCode}
+                  value={r.courseCode}
+                  className="bg-popover text-popover-foreground"
+                >
+                  {r.courseCode}
+                  {r.courseName ? ` — ${r.courseName}` : ""}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Classes to skip */}
+          <div className="space-y-2">
+            <Label htmlFor="bunk-count">Classes to skip</Label>
+            <Input
+              id="bunk-count"
+              type="number"
+              inputMode="numeric"
+              min={0}
+              max={100}
+              placeholder="e.g. 3"
+              value={bunkCount}
+              onChange={(e) => setBunkCount(e.target.value)}
+              disabled={!selectedCourse}
+              className="h-10"
+            />
+          </div>
+
+          {/* Current stats */}
+          {course && (
+            <div className="rounded-lg border p-3">
+              <p className="text-xs font-medium text-muted-foreground">
+                Current
+              </p>
+              <div className="mt-2 grid grid-cols-3 gap-2 text-center tabular-nums">
+                <div>
+                  <p className="text-lg font-semibold">{course.totalPresent}</p>
+                  <p className="text-xs text-muted-foreground">Present</p>
+                </div>
+                <div>
+                  <p className="text-lg font-semibold">
+                    {course.totalLectures}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Total</p>
+                </div>
+                <div>
+                  <p className="text-lg font-semibold">
+                    {(course.percentage ?? 0).toFixed(1)}%
+                  </p>
+                  <p className="text-xs text-muted-foreground">Attendance</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Result */}
+          {hasResult && (
+            <div
+              className={cn(
+                "rounded-lg border p-3",
+                percentageAfter >= DEFAULT_THRESHOLD &&
+                  "border-attendance-safe/30 bg-attendance-safe/5",
+                percentageAfter < DEFAULT_THRESHOLD &&
+                  percentageAfter >= DEFAULT_THRESHOLD - 5 &&
+                  "border-attendance-warning/30 bg-attendance-warning/5",
+                percentageAfter < DEFAULT_THRESHOLD - 5 &&
+                  "border-attendance-danger/30 bg-attendance-danger/5",
+              )}
+            >
+              <p className="text-xs font-medium text-muted-foreground">
+                After skipping {bunkNum} class{bunkNum !== 1 ? "es" : ""}
+              </p>
+              <div className="mt-2 grid grid-cols-3 gap-2 text-center tabular-nums">
+                <div>
+                  <p className="text-lg font-semibold">{presentAfter}</p>
+                  <p className="text-xs text-muted-foreground">Present</p>
+                </div>
+                <div>
+                  <p className="text-lg font-semibold">{totalAfter}</p>
+                  <p className="text-xs text-muted-foreground">Total</p>
+                </div>
+                <div>
+                  <p
+                    className={cn(
+                      "text-lg font-bold",
+                      percentageAfter >= DEFAULT_THRESHOLD &&
+                        "text-attendance-safe",
+                      percentageAfter < DEFAULT_THRESHOLD &&
+                        percentageAfter >= DEFAULT_THRESHOLD - 5 &&
+                        "text-attendance-warning",
+                      percentageAfter < DEFAULT_THRESHOLD - 5 &&
+                        "text-attendance-danger",
+                    )}
+                  >
+                    {percentageAfter.toFixed(1)}%
+                  </p>
+                  <p className="text-xs text-muted-foreground">Projected</p>
+                </div>
+              </div>
+              {percentageAfter < DEFAULT_THRESHOLD && (
+                <p className="mt-2 text-center text-xs text-attendance-danger">
+                  Below {DEFAULT_THRESHOLD}% threshold
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Shared sub-components                                              */
+/* ------------------------------------------------------------------ */
 
 interface AttendanceBadgeProps {
   value: number;
@@ -330,12 +585,10 @@ function AttendanceBadge({ value, threshold }: AttendanceBadgeProps) {
 interface SummaryCardProps {
   label: string;
   value: string;
-  attendance: Array<{ percentage: number; threshold: number }>;
 }
 
-function SummaryCard({ label, value, attendance }: SummaryCardProps) {
+function SummaryCard({ label, value }: SummaryCardProps) {
   const avg = Number.parseFloat(value);
-  const threshold = attendance[0]?.threshold ?? 75;
 
   return (
     <Card>
@@ -346,11 +599,11 @@ function SummaryCard({ label, value, attendance }: SummaryCardProps) {
         <span
           className={cn(
             "text-4xl font-bold tabular-nums",
-            avg >= threshold && "text-attendance-safe",
-            avg < threshold &&
-              avg >= threshold - 5 &&
+            avg >= DEFAULT_THRESHOLD && "text-attendance-safe",
+            avg < DEFAULT_THRESHOLD &&
+              avg >= DEFAULT_THRESHOLD - 5 &&
               "text-attendance-warning",
-            avg < threshold - 5 && "text-attendance-danger",
+            avg < DEFAULT_THRESHOLD - 5 && "text-attendance-danger",
           )}
         >
           {value}%

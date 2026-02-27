@@ -3,13 +3,17 @@ import { queryKeys } from "@/lib/query-keys";
 import { useQuery } from "@tanstack/react-query";
 
 interface Course {
+  id: string;
   courseCode: string;
-  courseTitle: string;
-  credits: number;
-  courseType: string;
-  semester: number;
-  instructor: string;
+  courseName: string;
+  credits: number | null;
+  facultyName: string | null;
+  section: string | null;
+  semester: string | null;
+  syncedAt: string;
 }
+
+export type { Course };
 
 export function useCourses() {
   return useQuery({

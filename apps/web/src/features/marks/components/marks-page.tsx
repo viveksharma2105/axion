@@ -124,25 +124,31 @@ export function MarksPage() {
                     >
                       <CartesianGrid
                         strokeDasharray="3 3"
-                        className="stroke-border"
+                        stroke="var(--border)"
+                        vertical={false}
                       />
                       <XAxis
                         dataKey="name"
-                        tick={{ fontSize: 11 }}
-                        className="fill-muted-foreground"
+                        tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+                        tickLine={false}
+                        axisLine={false}
                       />
                       <YAxis
                         domain={[0, 10]}
-                        tick={{ fontSize: 11 }}
-                        className="fill-muted-foreground"
+                        tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+                        tickLine={false}
+                        axisLine={false}
                       />
                       <Tooltip
                         contentStyle={{
-                          backgroundColor: "hsl(var(--card))",
-                          border: "1px solid hsl(var(--border))",
+                          backgroundColor: "var(--card)",
+                          border: "1px solid var(--border)",
                           borderRadius: "var(--radius)",
-                          color: "hsl(var(--card-foreground))",
+                          color: "var(--card-foreground)",
                           fontVariantNumeric: "tabular-nums",
+                        }}
+                        cursor={{
+                          fill: "color-mix(in oklch, var(--muted) 30%, transparent)",
                         }}
                         formatter={(value) => [Number(value).toFixed(2)]}
                       />
@@ -150,14 +156,16 @@ export function MarksPage() {
                       <Bar
                         dataKey="sgpa"
                         name="SGPA"
-                        fill="hsl(var(--chart-1))"
+                        fill="var(--chart-1)"
                         radius={[4, 4, 0, 0]}
+                        isAnimationActive={false}
                       />
                       <Bar
                         dataKey="cgpa"
                         name="CGPA"
-                        fill="hsl(var(--chart-4))"
+                        fill="var(--chart-4)"
                         radius={[4, 4, 0, 0]}
+                        isAnimationActive={false}
                       />
                     </BarChart>
                   </ResponsiveContainer>

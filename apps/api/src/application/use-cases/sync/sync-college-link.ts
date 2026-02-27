@@ -213,6 +213,9 @@ export class SyncCollegeLinkUseCase {
           section: studentProfileData.section,
           studentImage: studentProfileData.studentImage,
         });
+
+        // Invalidate student profile cache (keyed by userId, not collegeLinkId)
+        await this.cacheService.invalidateStudentProfile(link.userId);
       }
 
       // 5. Invalidate cache

@@ -4,15 +4,16 @@ import { useQuery } from "@tanstack/react-query";
 
 interface TimetableEntry {
   id: string;
-  courseCode: string;
-  courseTitle: string;
   dayOfWeek: number;
   /** ISO date "YYYY-MM-DD" for the specific lecture date */
   lectureDate: string | null;
   startTime: string;
   endTime: string;
-  room: string;
-  instructor: string;
+  courseCode: string | null;
+  courseName: string | null;
+  facultyName: string | null;
+  room: string | null;
+  section: string | null;
 }
 
 export type { TimetableEntry };

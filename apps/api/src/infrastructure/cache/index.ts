@@ -19,6 +19,7 @@ const TTL = {
   marks: 60 * 60, // 1 hour
   courses: 24 * 60 * 60, // 24 hours
   notificationCount: 5 * 60, // 5 minutes
+  "student-profile": 30 * 60, // 30 minutes
 } as const;
 
 type CacheNamespace = keyof typeof TTL;
@@ -94,6 +95,13 @@ export const cache = {
       buildKey("college:token", collegeLinkId),
     ];
     await redis.del(...keys);
+  },
+
+  /**
+   * Invalidate the student profile cache for a user.
+   */
+  async invalidateStudentProfile(userId: string): Promise<void> {
+    await redis.del(buildKey("student-profile", userId));
   },
 
   /**
