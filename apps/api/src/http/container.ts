@@ -41,6 +41,8 @@ import {
   GetTodayScheduleUseCase,
 } from "@/application/use-cases/timetable/get-timetable";
 
+import { GetCommonBreaksUseCase } from "@/application/use-cases/timetable/get-common-breaks";
+
 import {
   GetMarksSummaryUseCase,
   GetMarksUseCase,
@@ -130,6 +132,13 @@ export const getTimetableUseCase = new GetTimetableUseCase(
 export const getTodayScheduleUseCase = new GetTodayScheduleUseCase(
   timetableRepo,
   collegeLinkRepo,
+);
+
+export const getCommonBreaksUseCase = new GetCommonBreaksUseCase(
+  timetableRepo,
+  collegeLinkRepo,
+  collegeRepo,
+  collegeAdapterService,
 );
 
 export const getMarksUseCase = new GetMarksUseCase(

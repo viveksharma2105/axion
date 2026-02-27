@@ -19,6 +19,14 @@ export {
 export {
   timetableEntrySchema,
   type TimetableEntryResponse,
+  compareRequestSchema,
+  type CompareRequest,
+  commonBreakSchema,
+  type CommonBreak,
+  dayBreaksSchema,
+  type DayBreaks,
+  compareResponseSchema,
+  type CompareResponse,
 } from "./timetable.schema";
 
 export {

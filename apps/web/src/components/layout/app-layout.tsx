@@ -27,6 +27,7 @@ import {
   Menu,
   MoreHorizontal,
   Settings,
+  Users,
 } from "lucide-react";
 import { useState } from "react";
 import type { ReactNode } from "react";
@@ -40,6 +41,7 @@ const primaryNavItems = [
 
 const moreNavItems = [
   { to: "/courses", icon: BookOpen, label: "Courses" },
+  { to: "/common-breaks", icon: Users, label: "Common Breaks" },
   { to: "/notifications", icon: Bell, label: "Notifications" },
   { to: "/settings", icon: Settings, label: "Settings" },
 ] as const;
@@ -87,6 +89,7 @@ function DesktopSidebar() {
   const desktopPrimaryItems = [
     ...primaryNavItems,
     { to: "/courses", icon: BookOpen, label: "Courses" },
+    { to: "/common-breaks", icon: Users, label: "Common Breaks" },
   ] as const;
 
   return (

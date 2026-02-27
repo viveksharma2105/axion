@@ -17,6 +17,7 @@ import { Route as AuthenticatedSettingsRouteImport } from "./routes/_authenticat
 import { Route as AuthenticatedNotificationsRouteImport } from "./routes/_authenticated/notifications"
 import { Route as AuthenticatedMarksRouteImport } from "./routes/_authenticated/marks"
 import { Route as AuthenticatedCoursesRouteImport } from "./routes/_authenticated/courses"
+import { Route as AuthenticatedCommonBreaksRouteImport } from "./routes/_authenticated/common-breaks"
 import { Route as AuthenticatedAttendanceRouteImport } from "./routes/_authenticated/attendance"
 import { Route as AuthLoginRouteImport } from "./routes/_auth/login"
 
@@ -59,6 +60,12 @@ const AuthenticatedCoursesRoute = AuthenticatedCoursesRouteImport.update({
   path: "/courses",
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedCommonBreaksRoute =
+  AuthenticatedCommonBreaksRouteImport.update({
+    id: "/common-breaks",
+    path: "/common-breaks",
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedAttendanceRoute = AuthenticatedAttendanceRouteImport.update({
   id: "/attendance",
   path: "/attendance",
@@ -74,6 +81,7 @@ export interface FileRoutesByFullPath {
   "/": typeof AuthenticatedIndexRoute
   "/login": typeof AuthLoginRoute
   "/attendance": typeof AuthenticatedAttendanceRoute
+  "/common-breaks": typeof AuthenticatedCommonBreaksRoute
   "/courses": typeof AuthenticatedCoursesRoute
   "/marks": typeof AuthenticatedMarksRoute
   "/notifications": typeof AuthenticatedNotificationsRoute
@@ -84,6 +92,7 @@ export interface FileRoutesByTo {
   "/": typeof AuthenticatedIndexRoute
   "/login": typeof AuthLoginRoute
   "/attendance": typeof AuthenticatedAttendanceRoute
+  "/common-breaks": typeof AuthenticatedCommonBreaksRoute
   "/courses": typeof AuthenticatedCoursesRoute
   "/marks": typeof AuthenticatedMarksRoute
   "/notifications": typeof AuthenticatedNotificationsRoute
@@ -96,6 +105,7 @@ export interface FileRoutesById {
   "/_authenticated": typeof AuthenticatedRouteWithChildren
   "/_auth/login": typeof AuthLoginRoute
   "/_authenticated/attendance": typeof AuthenticatedAttendanceRoute
+  "/_authenticated/common-breaks": typeof AuthenticatedCommonBreaksRoute
   "/_authenticated/courses": typeof AuthenticatedCoursesRoute
   "/_authenticated/marks": typeof AuthenticatedMarksRoute
   "/_authenticated/notifications": typeof AuthenticatedNotificationsRoute
@@ -109,6 +119,7 @@ export interface FileRouteTypes {
     | "/"
     | "/login"
     | "/attendance"
+    | "/common-breaks"
     | "/courses"
     | "/marks"
     | "/notifications"
@@ -119,6 +130,7 @@ export interface FileRouteTypes {
     | "/"
     | "/login"
     | "/attendance"
+    | "/common-breaks"
     | "/courses"
     | "/marks"
     | "/notifications"
@@ -130,6 +142,7 @@ export interface FileRouteTypes {
     | "/_authenticated"
     | "/_auth/login"
     | "/_authenticated/attendance"
+    | "/_authenticated/common-breaks"
     | "/_authenticated/courses"
     | "/_authenticated/marks"
     | "/_authenticated/notifications"
@@ -201,6 +214,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthenticatedCoursesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    "/_authenticated/common-breaks": {
+      id: "/_authenticated/common-breaks"
+      path: "/common-breaks"
+      fullPath: "/common-breaks"
+      preLoaderRoute: typeof AuthenticatedCommonBreaksRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     "/_authenticated/attendance": {
       id: "/_authenticated/attendance"
       path: "/attendance"
@@ -230,6 +250,7 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAttendanceRoute: typeof AuthenticatedAttendanceRoute
+  AuthenticatedCommonBreaksRoute: typeof AuthenticatedCommonBreaksRoute
   AuthenticatedCoursesRoute: typeof AuthenticatedCoursesRoute
   AuthenticatedMarksRoute: typeof AuthenticatedMarksRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
@@ -240,6 +261,7 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAttendanceRoute: AuthenticatedAttendanceRoute,
+  AuthenticatedCommonBreaksRoute: AuthenticatedCommonBreaksRoute,
   AuthenticatedCoursesRoute: AuthenticatedCoursesRoute,
   AuthenticatedMarksRoute: AuthenticatedMarksRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
