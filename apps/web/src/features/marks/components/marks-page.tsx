@@ -65,7 +65,9 @@ export function MarksPage() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
             <BarChart3 className="h-12 w-12 text-muted-foreground" />
-            <h3 className="mt-4 text-lg font-semibold">No marks data</h3>
+            <h3 className="mt-4 text-lg font-semibold tracking-tight">
+              No marks data
+            </h3>
             <p className="mt-2 text-sm text-muted-foreground">
               Link your college account and sync to view your marks
             </p>
@@ -112,7 +114,7 @@ export function MarksPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-[200px] sm:h-[300px]">
+                <div className="h-52 sm:h-72">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                       data={summary.map((s) => ({
@@ -207,7 +209,7 @@ export function MarksPage() {
                             <span className="font-mono text-sm">
                               {record.courseCode}
                             </span>
-                            <p className="max-w-[200px] truncate text-xs text-muted-foreground">
+                            <p className="max-w-48 truncate text-xs text-muted-foreground">
                               {record.courseTitle}
                             </p>
                           </div>

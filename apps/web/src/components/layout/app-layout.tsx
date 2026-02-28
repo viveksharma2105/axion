@@ -60,12 +60,12 @@ interface AppLayoutProps {
 export function AppLayout({ children }: AppLayoutProps) {
   return (
     <TooltipProvider>
-      <div className="flex min-h-screen bg-background">
+      <div className="flex h-screen bg-background">
         {/* Desktop sidebar */}
         <DesktopSidebar />
 
         {/* Main content */}
-        <main className="flex-1 pb-16 lg:pb-0">
+        <main className="flex-1 overflow-y-auto pb-16 lg:pb-0">
           {/* Mobile header */}
           <MobileHeader />
 
@@ -93,7 +93,7 @@ function DesktopSidebar() {
   ] as const;
 
   return (
-    <aside className="hidden w-64 flex-shrink-0 border-r border-sidebar-border bg-sidebar lg:block">
+    <aside className="hidden h-screen w-64 flex-shrink-0 overflow-y-auto border-r border-sidebar-border bg-sidebar lg:block">
       <div className="flex h-full flex-col">
         {/* Logo */}
         <div className="flex h-14 items-center gap-2 px-6">

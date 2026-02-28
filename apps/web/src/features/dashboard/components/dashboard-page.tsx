@@ -98,7 +98,9 @@ function NoCollegeLinked() {
     <Card>
       <CardContent className="flex flex-col items-center justify-center py-12 text-center">
         <LinkIcon className="h-12 w-12 text-muted-foreground" />
-        <h3 className="mt-4 text-lg font-semibold">No college linked</h3>
+        <h3 className="mt-4 text-lg font-semibold tracking-tight">
+          No college linked
+        </h3>
         <p className="mt-2 text-sm text-muted-foreground">
           Link your college account to view your attendance, marks, and schedule
         </p>
@@ -390,7 +392,7 @@ function AttendanceChartCard({
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <Skeleton className="h-[200px] w-full sm:h-[300px]" />
+          <Skeleton className="h-52 w-full sm:h-72" />
         ) : chartData.length === 0 ? (
           <div className="flex flex-col items-center py-6 text-center">
             <GraduationCap className="h-8 w-8 text-muted-foreground" />
@@ -399,7 +401,7 @@ function AttendanceChartCard({
             </p>
           </div>
         ) : (
-          <div className="h-[220px] sm:h-[300px]">
+          <div className="h-56 sm:h-72">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={chartData}
@@ -490,7 +492,11 @@ interface GpaSummary {
   totalCredits: number;
 }
 
-function GpaTrendCard({ summary }: { summary: GpaSummary[] }) {
+interface GpaTrendCardProps {
+  summary: GpaSummary[];
+}
+
+function GpaTrendCard({ summary }: GpaTrendCardProps) {
   const chartData = summary.map((s) => ({
     name: `Sem ${s.semester}`,
     sgpa: s.sgpa,
@@ -507,7 +513,7 @@ function GpaTrendCard({ summary }: { summary: GpaSummary[] }) {
         <CardDescription>SGPA and CGPA across semesters</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="h-[200px] sm:h-[300px]">
+        <div className="h-52 sm:h-72">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={chartData}
@@ -602,7 +608,7 @@ function DashboardSkeleton() {
             <Skeleton className="h-4 w-56" />
           </CardHeader>
           <CardContent>
-            <Skeleton className="h-[200px] w-full sm:h-[300px]" />
+            <Skeleton className="h-52 w-full sm:h-72" />
           </CardContent>
         </Card>
       </div>

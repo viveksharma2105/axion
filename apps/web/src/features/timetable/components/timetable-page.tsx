@@ -61,7 +61,9 @@ export function TimetablePage() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
             <Calendar className="h-12 w-12 text-muted-foreground" />
-            <h3 className="mt-4 text-lg font-semibold">No schedule data</h3>
+            <h3 className="mt-4 text-lg font-semibold tracking-tight">
+              No schedule data
+            </h3>
             <p className="mt-2 text-sm text-muted-foreground">
               Link your college account and sync to view your timetable
             </p>

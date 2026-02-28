@@ -67,7 +67,9 @@ export function NotificationsPage() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
             <Bell className="h-12 w-12 text-muted-foreground" />
-            <h3 className="mt-4 text-lg font-semibold">No notifications</h3>
+            <h3 className="mt-4 text-lg font-semibold tracking-tight">
+              No notifications
+            </h3>
             <p className="mt-2 text-sm text-muted-foreground">
               You'll be notified when your attendance or marks change
             </p>

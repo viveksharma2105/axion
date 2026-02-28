@@ -24,7 +24,11 @@ import { useState } from "react";
 /* ────────────────────────────────────────────────────────────────────────── */
 /*  Google SVG Icon                                                          */
 /* ────────────────────────────────────────────────────────────────────────── */
-function GoogleIcon({ className }: { className?: string }) {
+interface GoogleIconProps {
+  className?: string;
+}
+
+function GoogleIcon({ className }: GoogleIconProps) {
   return (
     <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
       <path
@@ -152,7 +156,7 @@ export function LandingPage() {
       <section className="relative overflow-hidden">
         {/* Subtle radial gradient for visual depth */}
         <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 rounded-full bg-primary/5 blur-3xl" />
+          <div className="absolute left-1/2 top-0 h-96 w-full max-w-4xl -translate-x-1/2 rounded-full bg-primary/5 blur-3xl" />
         </div>
 
         <div className="mx-auto max-w-6xl px-4 pb-20 pt-20 sm:px-6 sm:pt-28 lg:px-8 lg:pt-36">
@@ -282,7 +286,9 @@ export function LandingPage() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 transition-colors duration-200 group-hover:bg-primary/15">
                   <feature.icon className="h-5 w-5 text-primary" />
                 </div>
-                <h3 className="mt-4 font-semibold">{feature.title}</h3>
+                <h3 className="mt-4 font-semibold tracking-tight">
+                  {feature.title}
+                </h3>
                 <p className="mt-2 text-sm text-muted-foreground">
                   {feature.description}
                 </p>
@@ -312,7 +318,9 @@ export function LandingPage() {
               <span className="text-5xl font-bold tabular-nums text-muted-foreground/20">
                 {step.step}
               </span>
-              <h3 className="mt-3 font-semibold">{step.title}</h3>
+              <h3 className="mt-3 font-semibold tracking-tight">
+                {step.title}
+              </h3>
               <p className="mt-2 text-sm text-muted-foreground">
                 {step.description}
               </p>
@@ -364,7 +372,7 @@ export function LandingPage() {
                 <item.icon className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold">{item.title}</h3>
+                <h3 className="font-semibold tracking-tight">{item.title}</h3>
                 <p className="mt-1 text-sm text-muted-foreground">
                   {item.description}
                 </p>

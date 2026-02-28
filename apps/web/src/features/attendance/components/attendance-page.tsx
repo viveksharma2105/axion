@@ -119,7 +119,7 @@ export function AttendancePage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="-mx-2 sm:mx-0">
-              <div className="h-[240px] sm:h-[300px]">
+              <div className="h-60 sm:h-72">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={attendance.map((r) => ({
@@ -260,7 +260,7 @@ export function AttendancePage() {
                               <span className="font-mono text-sm">
                                 {record.courseCode}
                               </span>
-                              <p className="max-w-[200px] truncate text-xs text-muted-foreground">
+                              <p className="max-w-48 truncate text-xs text-muted-foreground">
                                 {record.courseName}
                               </p>
                             </div>
@@ -650,7 +650,9 @@ function AttendanceEmpty() {
     <Card>
       <CardContent className="flex flex-col items-center justify-center py-12 text-center">
         <GraduationCap className="h-12 w-12 text-muted-foreground" />
-        <h3 className="mt-4 text-lg font-semibold">No attendance data</h3>
+        <h3 className="mt-4 text-lg font-semibold tracking-tight">
+          No attendance data
+        </h3>
         <p className="mt-2 text-sm text-muted-foreground">
           Link your college account and sync to view attendance
         </p>
@@ -659,7 +661,11 @@ function AttendanceEmpty() {
   );
 }
 
-function AttendanceError({ onRetry }: { onRetry: () => void }) {
+interface AttendanceErrorProps {
+  onRetry: () => void;
+}
+
+function AttendanceError({ onRetry }: AttendanceErrorProps) {
   return (
     <Alert variant="destructive">
       <AlertCircle className="h-4 w-4" />

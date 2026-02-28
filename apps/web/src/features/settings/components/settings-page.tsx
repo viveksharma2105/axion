@@ -22,6 +22,7 @@ import { useStudentProfile } from "@/features/profile/hooks/use-student-profile"
 import { api } from "@/lib/api-client";
 import { signOut } from "@/lib/auth-client";
 import { queryKeys } from "@/lib/query-keys";
+import { cn } from "@/lib/utils";
 import { useThemeStore } from "@/stores/use-theme-store";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -185,7 +186,7 @@ function CollegeLinkSection() {
               />
             </SheetContent>
             {/* Dialog-style sheet for desktop */}
-            <SheetContent side="right" className="hidden w-[400px] sm:block">
+            <SheetContent side="right" className="hidden w-96 sm:block">
               <SheetHeader>
                 <SheetTitle>Link College Account</SheetTitle>
                 <SheetDescription>
@@ -395,7 +396,10 @@ function StudentProfileSection() {
                       {field.label}
                     </span>
                     <span
-                      className={`text-sm font-medium ${field.mono ? "font-mono" : ""}`}
+                      className={cn(
+                        "text-sm font-medium",
+                        field.mono && "font-mono",
+                      )}
                     >
                       {field.value}
                     </span>

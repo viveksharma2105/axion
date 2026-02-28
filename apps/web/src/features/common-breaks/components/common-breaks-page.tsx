@@ -212,7 +212,11 @@ export function CommonBreaksPage() {
 
 // ─── Common Breaks Results ───────────────────────────────────────────────────
 
-function CommonBreaksResults({ data }: { data: DayBreaks[] }) {
+interface CommonBreaksResultsProps {
+  data: DayBreaks[];
+}
+
+function CommonBreaksResults({ data }: CommonBreaksResultsProps) {
   const totalBreaks = data.reduce((sum, d) => sum + d.breaks.length, 0);
   const totalMinutes = data.reduce(
     (sum, d) => sum + d.breaks.reduce((s, b) => s + b.durationMinutes, 0),
@@ -244,16 +248,10 @@ function CommonBreaksResults({ data }: { data: DayBreaks[] }) {
           Common Free Slots
         </CardTitle>
         <div className="flex flex-wrap gap-1.5 pt-1 sm:gap-2">
-          <Badge
-            variant="secondary"
-            className="text-[10px] tabular-nums sm:text-xs"
-          >
+          <Badge variant="secondary" className="text-xs tabular-nums">
             {totalBreaks} break{totalBreaks !== 1 ? "s" : ""} this week
           </Badge>
-          <Badge
-            variant="outline"
-            className="text-[10px] tabular-nums sm:text-xs"
-          >
+          <Badge variant="outline" className="text-xs tabular-nums">
             {formatDuration(totalMinutes)} total free time
           </Badge>
         </div>
@@ -274,7 +272,7 @@ function CommonBreaksResults({ data }: { data: DayBreaks[] }) {
                 {d.breaks.length > 0 && (
                   <Badge
                     variant="secondary"
-                    className="ml-1 h-4 min-w-4 px-0.5 text-[9px] tabular-nums sm:ml-1.5 sm:h-5 sm:min-w-5 sm:px-1 sm:text-[10px]"
+                    className="ml-1 h-4 min-w-4 px-0.5 text-xs tabular-nums sm:ml-1.5 sm:h-5 sm:min-w-5 sm:px-1"
                   >
                     {d.breaks.length}
                   </Badge>
@@ -304,7 +302,7 @@ function CommonBreaksResults({ data }: { data: DayBreaks[] }) {
                         <p className="text-xs font-semibold tabular-nums sm:text-sm">
                           {b.startTime}
                         </p>
-                        <p className="text-[10px] text-muted-foreground tabular-nums sm:text-xs">
+                        <p className="text-xs text-muted-foreground tabular-nums">
                           {b.endTime}
                         </p>
                       </div>
@@ -316,7 +314,7 @@ function CommonBreaksResults({ data }: { data: DayBreaks[] }) {
                             {formatDuration(b.durationMinutes)} free
                           </p>
                         </div>
-                        <p className="text-[10px] text-muted-foreground sm:text-xs">
+                        <p className="text-xs text-muted-foreground">
                           {b.startTime} &ndash; {b.endTime}
                         </p>
                       </div>
@@ -334,11 +332,11 @@ function CommonBreaksResults({ data }: { data: DayBreaks[] }) {
 
 // ─── Friend Timetable Section ────────────────────────────────────────────────
 
-function FriendTimetableSection({
-  entries,
-}: {
+interface FriendTimetableSectionProps {
   entries: FriendTimetableEntry[];
-}) {
+}
+
+function FriendTimetableSection({ entries }: FriendTimetableSectionProps) {
   const [expanded, setExpanded] = useState(false);
 
   if (entries.length === 0) return null;
@@ -396,7 +394,7 @@ function FriendTimetableSection({
                     {count > 0 && (
                       <Badge
                         variant="secondary"
-                        className="ml-1 h-4 min-w-4 px-0.5 text-[9px] tabular-nums sm:ml-1.5 sm:h-5 sm:min-w-5 sm:px-1 sm:text-[10px]"
+                        className="ml-1 h-4 min-w-4 px-0.5 text-xs tabular-nums sm:ml-1.5 sm:h-5 sm:min-w-5 sm:px-1"
                       >
                         {count}
                       </Badge>
@@ -439,14 +437,18 @@ function FriendTimetableSection({
   );
 }
 
-function FriendScheduleItem({ entry }: { entry: FriendTimetableEntry }) {
+interface FriendScheduleItemProps {
+  entry: FriendTimetableEntry;
+}
+
+function FriendScheduleItem({ entry }: FriendScheduleItemProps) {
   return (
     <div className="flex items-center gap-2.5 rounded-lg border p-2.5 sm:gap-4 sm:p-3">
       <div className="shrink-0 text-center">
         <p className="text-xs font-semibold tabular-nums sm:text-sm">
           {entry.startTime}
         </p>
-        <p className="text-[10px] text-muted-foreground tabular-nums sm:text-xs">
+        <p className="text-xs text-muted-foreground tabular-nums">
           {entry.endTime}
         </p>
       </div>
@@ -455,7 +457,7 @@ function FriendScheduleItem({ entry }: { entry: FriendTimetableEntry }) {
         <p className="truncate text-xs font-medium sm:text-sm">
           {entry.courseName || "Unknown Course"}
         </p>
-        <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[10px] text-muted-foreground sm:gap-x-2 sm:text-xs">
+        <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-muted-foreground sm:gap-x-2">
           {entry.courseCode && (
             <span className="font-mono">{entry.courseCode}</span>
           )}
