@@ -26,11 +26,15 @@ import {
   Clock,
   Coffee,
   Loader2,
+  PartyPopper,
   Users,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const SESSION_KEY = "axion:friend-creds";
+
+/** If total common break time on a day exceeds 7h 30min, it's effectively a holiday */
+const HOLIDAY_THRESHOLD_MINUTES = 450;
 
 const DAYS = [
   "Sunday",
@@ -223,6 +227,16 @@ function CommonBreaksResults({ data }: CommonBreaksResultsProps) {
     0,
   );
 
+  // Detect holiday days (total break time > 7h 30min means virtually no classes)
+  const dayMinutes = (d: DayBreaks) =>
+    d.breaks.reduce((s, b) => s + b.durationMinutes, 0);
+  const isHoliday = (d: DayBreaks) => dayMinutes(d) > HOLIDAY_THRESHOLD_MINUTES;
+  const holidays = data.filter(isHoliday);
+  const nonHolidayBreaks = data.reduce(
+    (sum, d) => sum + (isHoliday(d) ? 0 : d.breaks.length),
+    0,
+  );
+
   if (totalBreaks === 0) {
     return (
       <Card>
@@ -249,11 +263,20 @@ function CommonBreaksResults({ data }: CommonBreaksResultsProps) {
         </CardTitle>
         <div className="flex flex-wrap gap-1.5 pt-1 sm:gap-2">
           <Badge variant="secondary" className="text-xs tabular-nums">
-            {totalBreaks} break{totalBreaks !== 1 ? "s" : ""} this week
+            {nonHolidayBreaks} break{nonHolidayBreaks !== 1 ? "s" : ""} this
+            week
           </Badge>
           <Badge variant="outline" className="text-xs tabular-nums">
             {formatDuration(totalMinutes)} total free time
           </Badge>
+          {holidays.length > 0 && (
+            <Badge
+              variant="outline"
+              className="border-primary/40 bg-primary/10 text-xs tabular-nums"
+            >
+              {holidays.length} holiday{holidays.length !== 1 ? "s" : ""}
+            </Badge>
+          )}
         </div>
       </CardHeader>
       <CardContent className="px-4 sm:px-6">
@@ -269,13 +292,17 @@ function CommonBreaksResults({ data }: CommonBreaksResultsProps) {
                 )}
               >
                 <span>{d.dayName.slice(0, 3)}</span>
-                {d.breaks.length > 0 && (
-                  <Badge
-                    variant="secondary"
-                    className="ml-1 h-4 min-w-4 px-0.5 text-xs tabular-nums sm:ml-1.5 sm:h-5 sm:min-w-5 sm:px-1"
-                  >
-                    {d.breaks.length}
-                  </Badge>
+                {isHoliday(d) ? (
+                  <PartyPopper className="ml-1 h-3.5 w-3.5 text-primary sm:ml-1.5 sm:h-4 sm:w-4" />
+                ) : (
+                  d.breaks.length > 0 && (
+                    <Badge
+                      variant="secondary"
+                      className="ml-1 h-4 min-w-4 px-0.5 text-xs tabular-nums sm:ml-1.5 sm:h-5 sm:min-w-5 sm:px-1"
+                    >
+                      {d.breaks.length}
+                    </Badge>
+                  )
                 )}
               </TabsTrigger>
             ))}
@@ -291,6 +318,22 @@ function CommonBreaksResults({ data }: CommonBreaksResultsProps) {
                 <p className="py-4 text-center text-xs text-muted-foreground sm:py-6 sm:text-sm">
                   No common breaks on {d.dayName}
                 </p>
+              ) : isHoliday(d) ? (
+                <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-primary/30 bg-primary/5 py-6 text-center sm:py-8">
+                  <PartyPopper className="h-8 w-8 text-primary sm:h-10 sm:w-10" />
+                  <div>
+                    <p className="text-sm font-medium sm:text-base">
+                      It&apos;s a holiday!
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {d.dayName} is entirely free &mdash;{" "}
+                      <span className="tabular-nums">
+                        {formatDuration(dayMinutes(d))}
+                      </span>{" "}
+                      of common break time
+                    </p>
+                  </div>
+                </div>
               ) : (
                 <div className="space-y-2">
                   {d.breaks.map((b) => (

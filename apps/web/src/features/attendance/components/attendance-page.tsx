@@ -127,7 +127,7 @@ export function AttendancePage() {
                       courseName: r.courseName,
                       percentage: Math.round((r.percentage ?? 0) * 10) / 10,
                     }))}
-                    margin={{ top: 5, right: 10, left: -15, bottom: 40 }}
+                    margin={{ top: 5, right: 10, left: 0, bottom: 40 }}
                   >
                     <CartesianGrid
                       strokeDasharray="3 3"
@@ -157,7 +157,7 @@ export function AttendancePage() {
                       tickLine={false}
                       axisLine={false}
                       tickFormatter={(value) => `${value}%`}
-                      width={40}
+                      width={45}
                     />
                     <Tooltip
                       cursor={{ fill: "var(--muted)", opacity: 0.3 }}

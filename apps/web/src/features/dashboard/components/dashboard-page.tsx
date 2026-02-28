@@ -405,7 +405,7 @@ function AttendanceChartCard({
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={chartData}
-                margin={{ top: 5, right: 10, left: -10, bottom: 30 }}
+                margin={{ top: 5, right: 10, left: 0, bottom: 30 }}
               >
                 <CartesianGrid
                   strokeDasharray="3 3"
@@ -434,7 +434,7 @@ function AttendanceChartCard({
                   }}
                   tickLine={false}
                   axisLine={false}
-                  width={40}
+                  width={45}
                   tickFormatter={(value) => `${value}%`}
                 />
                 <Tooltip
